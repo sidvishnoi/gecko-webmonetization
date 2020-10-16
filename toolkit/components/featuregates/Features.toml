@@ -48,6 +48,16 @@ type = "boolean"
 bug-numbers = [1583604]
 is-public = {default = false, nightly = true}
 
+[web-api-link-monetization]
+title = "experimental-features-web-api-link-monetization"
+description = "experimental-features-web-api-link-monetization-description"
+description-links = {wm = "https://webmonetization.org"}
+restart-required = false
+preference = "dom.webmonetization.enabled"
+type = "boolean"
+bug-numbers = [1]
+is-public = {default = false, nightly = true}
+
 [css-focus-visible]
 title = "experimental-features-css-focus-visible"
 description = "experimental-features-css-focus-visible-description"

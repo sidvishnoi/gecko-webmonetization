@@ -3264,6 +3264,12 @@
   value: true
   mirror: always
 
+# Enables `<link rel="monetization">` tag.
+- name: dom.webmonetization.enabled
+  type: RelaxedAtomicBool
+  value: @IS_NIGHTLY_BUILD@
+  mirror: always
+
 # In case Touch API is enabled, this pref controls whether to support
 # ontouch* event handlers, document.createTouch, document.createTouchList and
 # document.createEvent("TouchEvent").

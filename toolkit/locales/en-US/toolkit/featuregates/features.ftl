@@ -37,6 +37,14 @@ experimental-features-web-api-link-preload-description = The <a data-l10n-name="
 
 # The title of the experiment should be kept in English as it may be referenced
 # by various online articles and is technical in nature.
+experimental-features-web-api-link-monetization =
+    .label = Web Monetization API
+# Do not translate "rel", "monetization" or "link" here, as they are all HTML spec
+# values that do not get translated.
+experimental-features-web-api-link-monetization-description = The Web Monetization API allows the creation of a payment stream from the user agent to the website. Learn more about <a data-l10n-name="wm">Web Monetization</a>.
+
+# The title of the experiment should be kept in English as it may be referenced
+# by various online articles and is technical in nature.
 experimental-features-css-focus-visible =
     .label = CSS: Pseudo-class: :focus-visible
 experimental-features-css-focus-visible-description = Allows focus styles to be applied to elements like buttons and form controls, only when they are focused using the keyboard (e.g. when tabbing between elements), and not when they are focused using a mouse or other pointing device. See <a data-l10n-name="bugzilla">bug 1617600</a> for more details.
