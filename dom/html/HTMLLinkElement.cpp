@@ -380,14 +380,16 @@ static const DOMTokenListSupportedToken sSupportedRelValues[] = {
     // Keep this and the one below in sync with ToLinkMask in
     // LinkStyle.cpp.
     // "preload" must come first because it can be disabled.
-    "preload",   "prefetch",   "dns-prefetch", "stylesheet", "next",
-    "alternate", "preconnect", "icon",         "search",     nullptr};
+    "preload", "prefetch",     "dns-prefetch", "stylesheet",
+    "next",    "alternate",    "preconnect",   "icon",
+    "search",  "monetization", nullptr};
 
 static const DOMTokenListSupportedToken sSupportedRelValuesWithManifest[] = {
     // Keep this in sync with ToLinkMask in LinkStyle.cpp.
     // "preload" and "manifest" must come first because they can be disabled.
-    "preload",   "manifest",   "prefetch", "dns-prefetch", "stylesheet", "next",
-    "alternate", "preconnect", "icon",     "search",       nullptr};
+    "preload",    "manifest", "prefetch",     "dns-prefetch",
+    "stylesheet", "next",     "alternate",    "preconnect",
+    "icon",       "search",   "monetization", nullptr};
 
 nsDOMTokenList* HTMLLinkElement::RelList() {
   if (!mRelList) {
