@@ -117,6 +117,13 @@ nsresult HTMLLinkElement::BindToTree(BindContext& aContext, nsINode& aParent) {
 
   if (IsInComposedDoc()) {
     TryDNSPrefetchOrPreconnectOrPrefetchOrPreloadOrPrerender();
+
+    if (IsWebMonetization()) {
+      nsAutoString href;
+      if (GetAttr(kNameSpaceID_None, nsGkAtoms::href, href)) {
+        printf("💰 [START] %s\n", NS_ConvertUTF16toUTF8(href).get());
+      }
+    }
   }
 
   void (HTMLLinkElement::*update)() =
@@ -171,6 +178,13 @@ void HTMLLinkElement::UnbindFromTree(bool aNullParent) {
 
   CreateAndDispatchEvent(oldDoc, u"DOMLinkRemoved"_ns);
   nsGenericHTMLElement::UnbindFromTree(aNullParent);
+
+  if (IsWebMonetization()) {
+    nsAutoString href;
+    if (GetAttr(kNameSpaceID_None, nsGkAtoms::href, href)) {
+      printf("💰 [REMOVE] %s\n", NS_ConvertUTF16toUTF8(href).get());
+    }
+  }
 
   Unused << UpdateStyleSheetInternal(oldDoc, oldShadowRoot);
 }
@@ -320,6 +334,13 @@ nsresult HTMLLinkElement::AfterSetAttr(int32_t aNameSpaceID, nsAtom* aName,
       if ((aName == nsGkAtoms::rel || aName == nsGkAtoms::href) &&
           IsInComposedDoc()) {
         TryDNSPrefetchOrPreconnectOrPrefetchOrPreloadOrPrerender();
+
+        if (IsWebMonetization()) {
+          nsAutoString href;
+          if (GetAttr(kNameSpaceID_None, nsGkAtoms::href, href)) {
+            printf("💰 [CHANGE] %s\n", NS_ConvertUTF16toUTF8(href).get());
+          }
+        }
       }
 
       if ((aName == nsGkAtoms::as || aName == nsGkAtoms::type ||
@@ -853,6 +874,12 @@ bool HTMLLinkElement::IsCSSMimeTypeAttributeForLinkElement(
   aSelf.GetAttr(kNameSpaceID_None, nsGkAtoms::type, type);
   nsContentUtils::SplitMimeType(type, mimeType, notUsed);
   return mimeType.IsEmpty() || mimeType.LowerCaseEqualsLiteral("text/css");
+}
+
+bool HTMLLinkElement::IsWebMonetization() const {
+  return AttrValueIs(kNameSpaceID_None, nsGkAtoms::rel, nsGkAtoms::monetization,
+                     eIgnoreCase) &&
+         HasAttr(kNameSpaceID_None, nsGkAtoms::href);
 }
 
 }  // namespace mozilla::dom

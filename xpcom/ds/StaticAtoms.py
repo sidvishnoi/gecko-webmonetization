@@ -669,6 +669,7 @@ STATIC_ATOMS = [
     Atom("mod", "mod"),
     Atom("mode", "mode"),
     Atom("modifiers", "modifiers"),
+    Atom("monetization", "monetization"),
     Atom("monochrome", "monochrome"),
     Atom("mouseover", "mouseover"),
     Atom("mozAccessiblecaret", "moz-accessiblecaret"),

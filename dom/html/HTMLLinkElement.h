@@ -208,6 +208,9 @@ class HTMLLinkElement final : public nsGenericHTMLElement,
   static bool IsCSSMimeTypeAttributeForLinkElement(
       const mozilla::dom::Element&);
 
+  // WebMonetization
+  bool IsWebMonetization() const;
+
   // LinkStyle
   nsIContent& AsContent() final { return *this; }
   const LinkStyle* AsLinkStyle() const final { return this; }
