@@ -9,6 +9,7 @@
 
 #include "mozilla/Attributes.h"
 #include "mozilla/dom/Link.h"
+#include "mozilla/dom/LinkMonetization.h"
 #include "mozilla/dom/LinkStyle.h"
 #include "mozilla/WeakPtr.h"
 #include "nsGenericHTMLElement.h"
@@ -24,6 +25,7 @@ namespace dom {
 // NOTE(emilio): If we stop inheriting from Link, we need to remove the
 // IsHTMLElement(nsGkAtoms::link) checks in Link.cpp.
 class HTMLLinkElement final : public nsGenericHTMLElement,
+                              public LinkMonetization,
                               public LinkStyle,
                               public Link {
  public:
@@ -208,13 +210,16 @@ class HTMLLinkElement final : public nsGenericHTMLElement,
   static bool IsCSSMimeTypeAttributeForLinkElement(
       const mozilla::dom::Element&);
 
-  // WebMonetization
-  bool IsWebMonetization() const;
 
   // LinkStyle
   nsIContent& AsContent() final { return *this; }
   const LinkStyle* AsLinkStyle() const final { return this; }
   Maybe<SheetInfo> GetStyleSheetInfo() final;
+
+  // WebMonetization
+  bool IsWebMonetization() const;
+  const LinkMonetization* AsLinkMonetization() const final { return this; }
+  Maybe<MonetizationInfo> GetMonetizationInfo() final;
 
   RefPtr<nsDOMTokenList> mRelList;
   RefPtr<nsDOMTokenList> mSizes;

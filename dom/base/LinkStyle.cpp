@@ -129,7 +129,7 @@ void LinkStyle::SetStyleSheet(StyleSheet* aStyleSheet) {
 
 void LinkStyle::GetCharset(nsAString& aCharset) { aCharset.Truncate(); }
 
-static uint32_t ToLinkMask(const nsAString& aLink) {
+uint32_t LinkStyle::ToLinkMask(const nsAString& aLink) {
   // Keep this in sync with sRelValues in HTMLLinkElement.cpp
   if (aLink.EqualsLiteral("prefetch"))
     return LinkStyle::ePREFETCH;

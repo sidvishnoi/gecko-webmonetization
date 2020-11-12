@@ -251,6 +251,7 @@ struct LifecycleCallbackArgs;
 class Link;
 class Location;
 class MediaQueryList;
+class Monetization;
 struct NetErrorInfo;
 class NodeFilter;
 class NodeInfo;
@@ -1797,6 +1798,8 @@ class Document : public nsINode,
   nsHTMLCSSStyleSheet* GetInlineStyleSheet() const {
     return mStyleAttrStyleSheet;
   }
+
+  void RemoveMonetization(Monetization&);
 
   virtual void SetScriptGlobalObject(nsIScriptGlobalObject* aGlobalObject);
 

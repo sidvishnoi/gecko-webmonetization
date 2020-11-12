@@ -6966,6 +6966,10 @@ void Document::RemoveAdditionalStyleSheet(additionalSheetType aType,
   }
 }
 
+void RemoveMonetization(Monetization&) {
+  // TODO
+}
+
 nsIGlobalObject* Document::GetScopeObject() const {
   nsCOMPtr<nsIGlobalObject> scope(do_QueryReferent(mScopeObject));
   return scope;

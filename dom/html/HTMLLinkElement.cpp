@@ -71,6 +71,7 @@ NS_IMPL_CYCLE_COLLECTION_CLASS(HTMLLinkElement)
 NS_IMPL_CYCLE_COLLECTION_TRAVERSE_BEGIN_INHERITED(HTMLLinkElement,
                                                   nsGenericHTMLElement)
   tmp->LinkStyle::Traverse(cb);
+  tmp->LinkMonetization::Traverse(cb);
   NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mRelList)
   NS_IMPL_CYCLE_COLLECTION_TRAVERSE(mSizes)
 NS_IMPL_CYCLE_COLLECTION_TRAVERSE_END
@@ -78,6 +79,7 @@ NS_IMPL_CYCLE_COLLECTION_TRAVERSE_END
 NS_IMPL_CYCLE_COLLECTION_UNLINK_BEGIN_INHERITED(HTMLLinkElement,
                                                 nsGenericHTMLElement)
   tmp->LinkStyle::Unlink();
+  tmp->LinkMonetization::Unlink();
   NS_IMPL_CYCLE_COLLECTION_UNLINK(mRelList)
   NS_IMPL_CYCLE_COLLECTION_UNLINK(mSizes)
 NS_IMPL_CYCLE_COLLECTION_UNLINK_END
@@ -130,6 +132,11 @@ nsresult HTMLLinkElement::BindToTree(BindContext& aContext, nsINode& aParent) {
       &HTMLLinkElement::UpdateStyleSheetInternal;
   nsContentUtils::AddScriptRunner(
       NewRunnableMethod("dom::HTMLLinkElement::BindToTree", this, update));
+
+  // void (HTMLLinkElement::*updateMonetization)() =
+  //     &HTMLLinkElement::UpdateMonetizationInternal;
+  // nsContentUtils::AddScriptRunner(NewRunnableMethod(
+  //     "dom::HTMLLinkElement::BindToTree", this, updateMonetization));
 
   if (IsInUncomposedDoc() &&
       AttrValueIs(kNameSpaceID_None, nsGkAtoms::rel, nsGkAtoms::localization,
@@ -278,9 +285,10 @@ nsresult HTMLLinkElement::AfterSetAttr(int32_t aNameSpaceID, nsAtom* aName,
   }
 
   if (aNameSpaceID == kNameSpaceID_None && aName == nsGkAtoms::href) {
-    mTriggeringPrincipal = nsContentUtils::GetAttrTriggeringPrincipal(
-        this, aValue ? aValue->GetStringValue() : EmptyString(),
-        aSubjectPrincipal);
+    LinkStyle::mTriggeringPrincipal =
+        nsContentUtils::GetAttrTriggeringPrincipal(
+            this, aValue ? aValue->GetStringValue() : EmptyString(),
+            aSubjectPrincipal);
   }
 
   // If a link's `rel` attribute was changed from or to `localization`,
@@ -325,7 +333,7 @@ nsresult HTMLLinkElement::AfterSetAttr(int32_t aNameSpaceID, nsAtom* aName,
       if (aName == nsGkAtoms::rel) {
         nsAutoString value;
         aValue->ToString(value);
-        uint32_t linkTypes = ParseLinkTypes(value);
+        uint32_t linkTypes = LinkStyle::ParseLinkTypes(value);
         if (GetSheet()) {
           dropSheet = !(linkTypes & eSTYLESHEET);
         }
@@ -436,10 +444,15 @@ already_AddRefed<nsIURI> HTMLLinkElement::GetHrefURI() const {
   return GetHrefURIForAnchors();
 }
 
+Maybe<LinkMonetization::MonetizationInfo>
+HTMLLinkElement::GetMonetizationInfo() {
+  return Nothing();
+}
+
 Maybe<LinkStyle::SheetInfo> HTMLLinkElement::GetStyleSheetInfo() {
   nsAutoString rel;
   GetAttr(kNameSpaceID_None, nsGkAtoms::rel, rel);
-  uint32_t linkTypes = ParseLinkTypes(rel);
+  uint32_t linkTypes = LinkStyle::ParseLinkTypes(rel);
   if (!(linkTypes & eSTYLESHEET)) {
     return Nothing();
   }
@@ -472,7 +485,7 @@ Maybe<LinkStyle::SheetInfo> HTMLLinkElement::GetStyleSheetInfo() {
   GetAttr(kNameSpaceID_None, nsGkAtoms::integrity, integrity);
 
   nsCOMPtr<nsIURI> uri = Link::GetURI();
-  nsCOMPtr<nsIPrincipal> prin = mTriggeringPrincipal;
+  nsCOMPtr<nsIPrincipal> prin = LinkStyle::mTriggeringPrincipal;
 
   nsAutoString nonce;
   nsString* cspNonce = static_cast<nsString*>(GetProperty(nsGkAtoms::nonce));
@@ -593,7 +606,7 @@ void HTMLLinkElement::
     return;
   }
 
-  uint32_t linkTypes = ParseLinkTypes(rel);
+  uint32_t linkTypes = LinkStyle::ParseLinkTypes(rel);
 
   if ((linkTypes & ePREFETCH) || (linkTypes & eNEXT)) {
     nsCOMPtr<nsIPrefetchService> prefetchService(
@@ -665,7 +678,7 @@ void HTMLLinkElement::UpdatePreload(nsAtom* aName, const nsAttrValue* aValue,
     return;
   }
 
-  uint32_t linkTypes = ParseLinkTypes(rel);
+  uint32_t linkTypes = LinkStyle::ParseLinkTypes(rel);
 
   if (!(linkTypes & ePRELOAD)) {
     return;

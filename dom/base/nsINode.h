@@ -92,6 +92,7 @@ template <typename T>
 class InclusiveAncestorsOfTypeIterator;
 template <typename T>
 class InclusiveFlatTreeAncestorsOfTypeIterator;
+class LinkMonetization;
 class LinkStyle;
 class MutationObservers;
 template <typename T>
@@ -512,6 +513,13 @@ class nsINode : public mozilla::dom::EventTarget {
   mozilla::dom::LinkStyle* AsLinkStyle() {
     return const_cast<mozilla::dom::LinkStyle*>(
         static_cast<const nsINode*>(this)->AsLinkStyle());
+  }
+
+  // Returns non-null if this element subclasses `LinkMonetization`.
+  virtual const mozilla::dom::LinkMonetization* AsLinkMonetization() const { return nullptr; }
+  mozilla::dom::LinkMonetization* AsLinkMonetization() {
+    return const_cast<mozilla::dom::LinkMonetization*>(
+        static_cast<const nsINode*>(this)->AsLinkMonetization());
   }
 
   /**

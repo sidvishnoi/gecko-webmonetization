@@ -281,6 +281,9 @@ class LinkStyle {
   bool mUpdatesEnabled;
   uint32_t mLineNumber;
   uint32_t mColumnNumber;
+
+ private:
+  static uint32_t ToLinkMask(const nsAString& aLink);
 };
 
 }  // namespace dom
