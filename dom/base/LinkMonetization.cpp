@@ -105,23 +105,21 @@ uint32_t LinkMonetization::ParseLinkTypes(const nsAString& aTypes) {
   return linkMask;
 }
 
-// Result<LinkMonetization::Update, nsresult>
-// LinkMonetization::UpdateMonetization(
-//     nsIMonetizationLoaderObserver* aObserver) {
-//   return DoUpdateMonetization(nullptr, aObserver, false);
-// }
+Result<LinkMonetization::Update, nsresult> LinkMonetization::UpdateMonetization(
+    nsIMonetizationLoaderObserver* aObserver) {
+  return DoUpdateMonetization(nullptr, aObserver, false);
+}
 
 Result<LinkMonetization::Update, nsresult>
 LinkMonetization::UpdateMonetizationInternal(Document* aOldDocument,
                                              bool aForceUpdate) {
-  return DoUpdateMonetization(aOldDocument, aForceUpdate);
+  return DoUpdateMonetization(aOldDocument, nullptr, aForceUpdate);
 }
 
 Result<LinkMonetization::Update, nsresult>
-LinkMonetization::DoUpdateMonetization(
-    Document* aOldDocument,
-    //  nsIMonetizationLoaderObserver* aObserver,
-    bool aForceUpdate) {
+LinkMonetization::DoUpdateMonetization(Document* aOldDocument,
+                                       nsIMonetizationLoaderObserver* aObserver,
+                                       bool aForceUpdate) {
   nsIContent& thisContent = AsContent();
   if (thisContent.IsInShadowTree()) {
     return Update{};

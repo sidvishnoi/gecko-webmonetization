@@ -13,6 +13,7 @@
 #include "mozilla/Unused.h"
 #include "nsISupports.h"
 #include "nsTArray.h"
+#include "mozilla/dom/nsIMonetizationLoaderObserver.h"
 
 class nsIContent;
 class nsIPrincipal;
@@ -113,14 +114,13 @@ class LinkMonetization {
    */
   void SetMonetization(Monetization* aMonetization);
 
-  // /**
-  //  * Tells this element to update the monetization.
-  //  *
-  //  * @param aObserver    observer to notify once the monetization is loaded.
-  //  *                     This will be passed to the CSSLoader
-  //  */
-  // Result<Update, nsresult>
-  // UpdateMonetization(nsIMonetizationLoaderObserver*);
+  /**
+   * Tells this element to update the monetization.
+   *
+   * @param aObserver    observer to notify once the monetization is loaded.
+   *                     This will be passed to the CSSLoader
+   */
+  Result<Update, nsresult> UpdateMonetization(nsIMonetizationLoaderObserver*);
 
   /**
    * Tells this element whether to update the monetization when the
@@ -194,10 +194,9 @@ class LinkMonetization {
    *                     about the content that affects the resulting
    * monetization changed but the URI may not have changed.
    */
-  Result<Update, nsresult> DoUpdateMonetization(
-      Document* aOldDocument,
-      // nsIMonetizationLoaderObserver*,
-      bool afalseUpdate);
+  Result<Update, nsresult> DoUpdateMonetization(Document* aOldDocument,
+                                                nsIMonetizationLoaderObserver*,
+                                                bool afalseUpdate);
 
   RefPtr<Monetization> mMonetization;
   nsCOMPtr<nsIPrincipal> mTriggeringPrincipal;

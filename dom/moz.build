@@ -107,6 +107,7 @@ DIRS += [
     "localstorage",
     "prio",
     "l10n",
+    "webmonetization",
 ]
 
 if CONFIG["OS_ARCH"] == "WINNT":
