@@ -194,6 +194,7 @@ void HTMLLinkElement::UnbindFromTree(bool aNullParent) {
   }
 
   Unused << UpdateStyleSheetInternal(oldDoc, oldShadowRoot);
+  Unused << UpdateMonetizationInternal(oldDoc);
 }
 
 bool HTMLLinkElement::ParseAttribute(int32_t aNamespaceID, nsAtom* aAttribute,
@@ -334,6 +335,7 @@ nsresult HTMLLinkElement::AfterSetAttr(int32_t aNameSpaceID, nsAtom* aName,
         nsAutoString value;
         aValue->ToString(value);
         uint32_t linkTypes = ParseLinkTypes(value);
+        // TODO(sidvishnoi): handle same for eMONETIZATION
         if (GetSheet()) {
           dropSheet = !(linkTypes & eSTYLESHEET);
         }
@@ -363,6 +365,9 @@ nsresult HTMLLinkElement::AfterSetAttr(int32_t aNameSpaceID, nsAtom* aName,
 
       Unused << UpdateStyleSheetInternal(
           nullptr, nullptr, forceUpdate ? ForceUpdate::Yes : ForceUpdate::No);
+
+      // TODO(sidvishnoi): use proper forceUpdate
+      Unused << UpdateMonetizationInternal(nullptr, false);
     }
   } else {
     if (aNameSpaceID == kNameSpaceID_None) {

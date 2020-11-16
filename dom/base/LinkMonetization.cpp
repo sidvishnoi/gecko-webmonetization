@@ -136,6 +136,7 @@ LinkMonetization::DoUpdateMonetization(Document* aOldDocument,
     return Update{};
   }
 
+  printf("🤑 Monetization: %s\n", info->mURI->GetSpecOrDefault().get());
   return Update{};
   // auto resultOrError = doc->CSSLoader()->LoadStyleLink(*info, aObserver);
   // if (resultOrError.isErr()) {

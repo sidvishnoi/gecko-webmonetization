@@ -177,7 +177,7 @@ class LinkMonetization {
    * TODO(emilio): Should probably pass a single DocumentOrShadowRoot.
    */
   Result<Update, nsresult> UpdateMonetizationInternal(
-      Document* aOldDocument, bool afalseUpdate = false);
+      Document* aOldDocument, bool aForceUpdate = false);
 
   /**
    * @param aOldDocument should be non-null only if we're updating because we
@@ -189,7 +189,7 @@ class LinkMonetization {
    */
   Result<Update, nsresult> DoUpdateMonetization(Document* aOldDocument,
                                                 nsIMonetizationLoaderObserver*,
-                                                bool afalseUpdate);
+                                                bool aForceUpdate = false);
 
   RefPtr<Monetization> mMonetization;
   nsCOMPtr<nsIPrincipal> mTriggeringPrincipal;
