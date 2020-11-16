@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* internal interface for observing CSS style sheet loads */
+/* internal interface for observing monetization link loads */
 
 #ifndef nsIMonetizationLoaderObserver_h___
 #define nsIMonetizationLoaderObserver_h___
@@ -26,24 +26,18 @@ class nsIMonetizationLoaderObserver : public nsISupports {
  public:
   NS_DECLARE_STATIC_IID_ACCESSOR(NS_IMONETIZATIONLOADEROBSERVER_IID)
 
-  // /**
-  //  * StyleSheetLoaded is called after aSheet is marked complete and before
-  //  any
-  //  * load events associated with aSheet are fired.
-  //  * @param aSheet the sheet that was loaded. Guaranteed to always be
-  //  *        non-null, even if aStatus indicates failure.
-  //  * @param aWasDeferred whether the sheet load was deferred, due to it being
-  //  an
-  //  *        alternate sheet, or having a non-matching media list.
-  //  * @param aStatus is a success code if the sheet loaded successfully and a
-  //  *        failure code otherwise.  Note that successful load of aSheet
-  //  *        doesn't indicate anything about whether the data actually parsed
-  //  *        as CSS, and doesn't indicate anything about the status of any
-  //  child
-  //  *        sheets of aSheet.
-  //  */
-  // NS_IMETHOD StyleSheetLoaded(mozilla::StyleSheet* aSheet, bool aWasDeferred,
-  //                             nsresult aStatus) = 0;
+  /**
+   * MonetizationLoaded is called after aMonetization is marked complete and
+   * before any load events associated with aMonetization are fired.
+   * @param aMonetization the payment endpoint that was loaded. Guaranteed to
+   *        always be non-null, even if aStatus indicates failure.
+   * @param aStatus is a success code if the payment endpoint loaded
+   *        successfully and a failure code otherwise.  Note that successful
+   *        load of aMonetization doesn't indicate anything about whether the
+   *        data actually parsed as spsp+json.
+   */
+  NS_IMETHOD MonetizationLoaded(mozilla::dom::Monetization* aMonetization,
+                                nsresult aStatus) = 0;
 };
 
 NS_DEFINE_STATIC_IID_ACCESSOR(nsIMonetizationLoaderObserver,
