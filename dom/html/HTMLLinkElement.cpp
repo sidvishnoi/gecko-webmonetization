@@ -451,7 +451,22 @@ already_AddRefed<nsIURI> HTMLLinkElement::GetHrefURI() const {
 
 Maybe<LinkMonetization::MonetizationInfo>
 HTMLLinkElement::GetMonetizationInfo() {
-  return Nothing();
+  nsAutoString rel;
+  GetAttr(kNameSpaceID_None, nsGkAtoms::rel, rel);
+  uint32_t linkTypes = ParseLinkTypes(rel);
+  if (!(linkTypes & eMONETIZATION)) {
+    return Nothing();
+  }
+
+  nsAutoString href;
+  GetAttr(kNameSpaceID_None, nsGkAtoms::href, href);
+  if (href.IsEmpty()) {
+    return Nothing();
+  }
+
+  nsCOMPtr<nsIURI> uri = Link::GetURI();
+  nsCOMPtr<nsIPrincipal> prin = LinkMonetization::mTriggeringPrincipal;
+  return Some(MonetizationInfo(*OwnerDoc(), uri.forget(), prin.forget()));
 }
 
 Maybe<LinkStyle::SheetInfo> HTMLLinkElement::GetStyleSheetInfo() {
