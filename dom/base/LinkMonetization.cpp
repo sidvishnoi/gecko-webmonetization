@@ -64,47 +64,6 @@ void LinkMonetization::SetMonetization(Monetization* aMonetization) {
   }
 }
 
-uint32_t LinkMonetization::ToLinkMask(const nsAString& aLink) {
-  // Keep this in sync with sRelValues in HTMLLinkElement.cpp
-  if (aLink.EqualsLiteral("monetization"))
-    return LinkMonetization::eMONETIZATION;
-  else
-    return 0;
-}
-
-uint32_t LinkMonetization::ParseLinkTypes(const nsAString& aTypes) {
-  uint32_t linkMask = 0;
-  nsAString::const_iterator start, done;
-  aTypes.BeginReading(start);
-  aTypes.EndReading(done);
-  if (start == done) return linkMask;
-
-  nsAString::const_iterator current(start);
-  bool inString = !nsContentUtils::IsHTMLWhitespace(*current);
-  nsAutoString subString;
-
-  while (current != done) {
-    if (nsContentUtils::IsHTMLWhitespace(*current)) {
-      if (inString) {
-        nsContentUtils::ASCIIToLower(Substring(start, current), subString);
-        linkMask |= ToLinkMask(subString);
-        inString = false;
-      }
-    } else {
-      if (!inString) {
-        start = current;
-        inString = true;
-      }
-    }
-    ++current;
-  }
-  if (inString) {
-    nsContentUtils::ASCIIToLower(Substring(start, current), subString);
-    linkMask |= ToLinkMask(subString);
-  }
-  return linkMask;
-}
-
 Result<LinkMonetization::Update, nsresult> LinkMonetization::UpdateMonetization(
     nsIMonetizationLoaderObserver* aObserver) {
   return DoUpdateMonetization(nullptr, aObserver, false);

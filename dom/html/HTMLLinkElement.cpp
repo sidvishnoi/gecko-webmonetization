@@ -333,7 +333,7 @@ nsresult HTMLLinkElement::AfterSetAttr(int32_t aNameSpaceID, nsAtom* aName,
       if (aName == nsGkAtoms::rel) {
         nsAutoString value;
         aValue->ToString(value);
-        uint32_t linkTypes = LinkStyle::ParseLinkTypes(value);
+        uint32_t linkTypes = ParseLinkTypes(value);
         if (GetSheet()) {
           dropSheet = !(linkTypes & eSTYLESHEET);
         }
@@ -452,7 +452,7 @@ HTMLLinkElement::GetMonetizationInfo() {
 Maybe<LinkStyle::SheetInfo> HTMLLinkElement::GetStyleSheetInfo() {
   nsAutoString rel;
   GetAttr(kNameSpaceID_None, nsGkAtoms::rel, rel);
-  uint32_t linkTypes = LinkStyle::ParseLinkTypes(rel);
+  uint32_t linkTypes = ParseLinkTypes(rel);
   if (!(linkTypes & eSTYLESHEET)) {
     return Nothing();
   }
@@ -606,7 +606,7 @@ void HTMLLinkElement::
     return;
   }
 
-  uint32_t linkTypes = LinkStyle::ParseLinkTypes(rel);
+  uint32_t linkTypes = ParseLinkTypes(rel);
 
   if ((linkTypes & ePREFETCH) || (linkTypes & eNEXT)) {
     nsCOMPtr<nsIPrefetchService> prefetchService(
@@ -678,7 +678,7 @@ void HTMLLinkElement::UpdatePreload(nsAtom* aName, const nsAttrValue* aValue,
     return;
   }
 
-  uint32_t linkTypes = LinkStyle::ParseLinkTypes(rel);
+  uint32_t linkTypes = ParseLinkTypes(rel);
 
   if (!(linkTypes & ePRELOAD)) {
     return;
@@ -893,6 +893,60 @@ bool HTMLLinkElement::IsWebMonetization() const {
   return AttrValueIs(kNameSpaceID_None, nsGkAtoms::rel, nsGkAtoms::monetization,
                      eIgnoreCase) &&
          HasAttr(kNameSpaceID_None, nsGkAtoms::href);
+}
+
+uint32_t HTMLLinkElement::ToLinkMask(const nsAString& aLink) {
+  if (aLink.EqualsLiteral("prefetch"))
+    return HTMLLinkElement::ePREFETCH;
+  else if (aLink.EqualsLiteral("dns-prefetch"))
+    return HTMLLinkElement::eDNS_PREFETCH;
+  else if (aLink.EqualsLiteral("stylesheet"))
+    return HTMLLinkElement::eSTYLESHEET;
+  else if (aLink.EqualsLiteral("next"))
+    return HTMLLinkElement::eNEXT;
+  else if (aLink.EqualsLiteral("alternate"))
+    return HTMLLinkElement::eALTERNATE;
+  else if (aLink.EqualsLiteral("preconnect"))
+    return HTMLLinkElement::ePRECONNECT;
+  else if (aLink.EqualsLiteral("preload"))
+    return HTMLLinkElement::ePRELOAD;
+  else if (aLink.EqualsLiteral("monetization"))
+    return HTMLLinkElement::eMONETIZATION;
+  else
+    return 0;
+}
+
+uint32_t HTMLLinkElement::ParseLinkTypes(const nsAString& aTypes) {
+  uint32_t linkMask = 0;
+  nsAString::const_iterator start, done;
+  aTypes.BeginReading(start);
+  aTypes.EndReading(done);
+  if (start == done) return linkMask;
+
+  nsAString::const_iterator current(start);
+  bool inString = !nsContentUtils::IsHTMLWhitespace(*current);
+  nsAutoString subString;
+
+  while (current != done) {
+    if (nsContentUtils::IsHTMLWhitespace(*current)) {
+      if (inString) {
+        nsContentUtils::ASCIIToLower(Substring(start, current), subString);
+        linkMask |= ToLinkMask(subString);
+        inString = false;
+      }
+    } else {
+      if (!inString) {
+        start = current;
+        inString = true;
+      }
+    }
+    ++current;
+  }
+  if (inString) {
+    nsContentUtils::ASCIIToLower(Substring(start, current), subString);
+    linkMask |= ToLinkMask(subString);
+  }
+  return linkMask;
 }
 
 }  // namespace mozilla::dom

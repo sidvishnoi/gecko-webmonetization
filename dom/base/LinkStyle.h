@@ -102,20 +102,6 @@ class LinkStyle {
     return aNode ? FromNode(*aNode) : nullptr;
   }
 
-  enum RelValue {
-    ePREFETCH = 0x00000001,
-    eDNS_PREFETCH = 0x00000002,
-    eSTYLESHEET = 0x00000004,
-    eNEXT = 0x00000008,
-    eALTERNATE = 0x00000010,
-    ePRECONNECT = 0x00000020,
-    // NOTE: 0x40 is unused
-    ePRELOAD = 0x00000080
-  };
-
-  // The return value is a bitwise or of 0 or more RelValues.
-  static uint32_t ParseLinkTypes(const nsAString& aTypes);
-
   void UpdateStyleSheetInternal() {
     Unused << UpdateStyleSheetInternal(nullptr, nullptr);
   }
@@ -281,9 +267,6 @@ class LinkStyle {
   bool mUpdatesEnabled;
   uint32_t mLineNumber;
   uint32_t mColumnNumber;
-
- private:
-  static uint32_t ToLinkMask(const nsAString& aLink);
 };
 
 }  // namespace dom

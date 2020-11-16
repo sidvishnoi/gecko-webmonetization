@@ -76,13 +76,6 @@ class LinkMonetization {
     return aNode ? FromNode(*aNode) : nullptr;
   }
 
-  enum RelValue {
-    eMONETIZATION = 0x00000001,
-  };
-
-  // The return value is a bitwise or of 0 or more RelValues.
-  static uint32_t ParseLinkTypes(const nsAString& aTypes);
-
   void UpdateMonetizationInternal() {
     Unused << UpdateMonetizationInternal(nullptr);
   }
@@ -203,9 +196,6 @@ class LinkMonetization {
   bool mUpdatesEnabled;
   uint32_t mLineNumber;
   uint32_t mColumnNumber;
-
- private:
-  static uint32_t ToLinkMask(const nsAString& aLink);
 };
 
 }  // namespace mozilla::dom

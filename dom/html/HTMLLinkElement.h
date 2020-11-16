@@ -191,6 +191,20 @@ class HTMLLinkElement final : public nsGenericHTMLElement,
   static bool CheckPreloadAttrs(const nsAttrValue& aAs, const nsAString& aType,
                                 const nsAString& aMedia, Document* aDocument);
 
+  enum RelValue : uint32_t {
+    ePREFETCH = 0x00000001,
+    eDNS_PREFETCH = 0x00000002,
+    eSTYLESHEET = 0x00000004,
+    eNEXT = 0x00000008,
+    eALTERNATE = 0x00000010,
+    ePRECONNECT = 0x00000020,
+    // NOTE: 0x40 is unused
+    ePRELOAD = 0x00000080,
+    eMONETIZATION = 0x00000100,
+  };
+  // The return value is a bitwise or of 0 or more RelValues.
+  static uint32_t ParseLinkTypes(const nsAString& aTypes);
+
  protected:
   virtual ~HTMLLinkElement();
 
@@ -209,7 +223,6 @@ class HTMLLinkElement final : public nsGenericHTMLElement,
   // link elements.
   static bool IsCSSMimeTypeAttributeForLinkElement(
       const mozilla::dom::Element&);
-
 
   // LinkStyle
   nsIContent& AsContent() final { return *this; }
@@ -235,6 +248,8 @@ class HTMLLinkElement final : public nsGenericHTMLElement,
   //
   // See https://github.com/whatwg/html/issues/3840#issuecomment-481034206.
   bool mExplicitlyEnabled = false;
+
+  static uint32_t ToLinkMask(const nsAString& aLink);
 };
 
 }  // namespace dom

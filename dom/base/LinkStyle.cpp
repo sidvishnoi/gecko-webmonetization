@@ -129,59 +129,6 @@ void LinkStyle::SetStyleSheet(StyleSheet* aStyleSheet) {
 
 void LinkStyle::GetCharset(nsAString& aCharset) { aCharset.Truncate(); }
 
-uint32_t LinkStyle::ToLinkMask(const nsAString& aLink) {
-  // Keep this in sync with sRelValues in HTMLLinkElement.cpp
-  if (aLink.EqualsLiteral("prefetch"))
-    return LinkStyle::ePREFETCH;
-  else if (aLink.EqualsLiteral("dns-prefetch"))
-    return LinkStyle::eDNS_PREFETCH;
-  else if (aLink.EqualsLiteral("stylesheet"))
-    return LinkStyle::eSTYLESHEET;
-  else if (aLink.EqualsLiteral("next"))
-    return LinkStyle::eNEXT;
-  else if (aLink.EqualsLiteral("alternate"))
-    return LinkStyle::eALTERNATE;
-  else if (aLink.EqualsLiteral("preconnect"))
-    return LinkStyle::ePRECONNECT;
-  else if (aLink.EqualsLiteral("preload"))
-    return LinkStyle::ePRELOAD;
-  else
-    return 0;
-}
-
-uint32_t LinkStyle::ParseLinkTypes(const nsAString& aTypes) {
-  uint32_t linkMask = 0;
-  nsAString::const_iterator start, done;
-  aTypes.BeginReading(start);
-  aTypes.EndReading(done);
-  if (start == done) return linkMask;
-
-  nsAString::const_iterator current(start);
-  bool inString = !nsContentUtils::IsHTMLWhitespace(*current);
-  nsAutoString subString;
-
-  while (current != done) {
-    if (nsContentUtils::IsHTMLWhitespace(*current)) {
-      if (inString) {
-        nsContentUtils::ASCIIToLower(Substring(start, current), subString);
-        linkMask |= ToLinkMask(subString);
-        inString = false;
-      }
-    } else {
-      if (!inString) {
-        start = current;
-        inString = true;
-      }
-    }
-    ++current;
-  }
-  if (inString) {
-    nsContentUtils::ASCIIToLower(Substring(start, current), subString);
-    linkMask |= ToLinkMask(subString);
-  }
-  return linkMask;
-}
-
 Result<LinkStyle::Update, nsresult> LinkStyle::UpdateStyleSheet(
     nsICSSLoaderObserver* aObserver) {
   return DoUpdateStyleSheet(nullptr, nullptr, aObserver, ForceUpdate::No);

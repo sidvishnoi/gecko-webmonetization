@@ -617,7 +617,7 @@ nsresult nsContentSink::ProcessLinkFromHeader(
     const nsAString& aSrcset, const nsAString& aSizes, const nsAString& aType,
     const nsAString& aMedia, const nsAString& aCrossOrigin,
     const nsAString& aReferrerPolicy, const nsAString& aAs) {
-  uint32_t linkTypes = LinkStyle::ParseLinkTypes(aRel);
+  uint32_t linkTypes = HTMLLinkElement::ParseLinkTypes(aRel);
 
   // The link relation may apply to a different resource, specified
   // in the anchor parameter. For the link relations supported so far,
@@ -629,30 +629,30 @@ nsresult nsContentSink::ProcessLinkFromHeader(
 
   if (nsContentUtils::PrefetchPreloadEnabled(mDocShell)) {
     // prefetch href if relation is "next" or "prefetch"
-    if ((linkTypes & LinkStyle::eNEXT) || (linkTypes & LinkStyle::ePREFETCH)) {
+    if ((linkTypes & HTMLLinkElement::eNEXT) || (linkTypes & HTMLLinkElement::ePREFETCH)) {
       PrefetchHref(aHref, aAs, aType, aMedia);
     }
 
-    if (!aHref.IsEmpty() && (linkTypes & LinkStyle::eDNS_PREFETCH)) {
+    if (!aHref.IsEmpty() && (linkTypes & HTMLLinkElement::eDNS_PREFETCH)) {
       PrefetchDNS(aHref);
     }
 
-    if (!aHref.IsEmpty() && (linkTypes & LinkStyle::ePRECONNECT)) {
+    if (!aHref.IsEmpty() && (linkTypes & HTMLLinkElement::ePRECONNECT)) {
       Preconnect(aHref, aCrossOrigin);
     }
 
-    if (linkTypes & LinkStyle::ePRELOAD) {
+    if (linkTypes & HTMLLinkElement::ePRELOAD) {
       PreloadHref(aHref, aAs, aType, aMedia, aIntegrity, aSrcset, aSizes,
                   aCrossOrigin, aReferrerPolicy);
     }
   }
 
   // is it a stylesheet link?
-  if (!(linkTypes & LinkStyle::eSTYLESHEET)) {
+  if (!(linkTypes & HTMLLinkElement::eSTYLESHEET)) {
     return NS_OK;
   }
 
-  bool isAlternate = linkTypes & LinkStyle::eALTERNATE;
+  bool isAlternate = linkTypes & HTMLLinkElement::eALTERNATE;
   return ProcessStyleLinkFromHeader(aHref, isAlternate, aTitle, aIntegrity,
                                     aType, aMedia, aReferrerPolicy);
 }
