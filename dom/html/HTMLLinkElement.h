@@ -230,7 +230,6 @@ class HTMLLinkElement final : public nsGenericHTMLElement,
   Maybe<SheetInfo> GetStyleSheetInfo() final;
 
   // WebMonetization
-  bool IsWebMonetization() const;
   const LinkMonetization* AsLinkMonetization() const final { return this; }
   Maybe<MonetizationInfo> GetMonetizationInfo() final;
 
