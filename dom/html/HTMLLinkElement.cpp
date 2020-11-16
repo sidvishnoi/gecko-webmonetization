@@ -133,10 +133,10 @@ nsresult HTMLLinkElement::BindToTree(BindContext& aContext, nsINode& aParent) {
   nsContentUtils::AddScriptRunner(
       NewRunnableMethod("dom::HTMLLinkElement::BindToTree", this, update));
 
-  // void (HTMLLinkElement::*updateMonetization)() =
-  //     &HTMLLinkElement::UpdateMonetizationInternal;
-  // nsContentUtils::AddScriptRunner(NewRunnableMethod(
-  //     "dom::HTMLLinkElement::BindToTree", this, updateMonetization));
+  void (HTMLLinkElement::*updateMonetization)() =
+      &HTMLLinkElement::UpdateMonetizationInternal;
+  nsContentUtils::AddScriptRunner(NewRunnableMethod(
+      "dom::HTMLLinkElement::BindToTree", this, updateMonetization));
 
   if (IsInUncomposedDoc() &&
       AttrValueIs(kNameSpaceID_None, nsGkAtoms::rel, nsGkAtoms::localization,

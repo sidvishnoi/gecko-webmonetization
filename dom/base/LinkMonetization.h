@@ -21,7 +21,7 @@ class nsIURI;
 
 namespace mozilla::dom {
 
-class Monetization : public nsISupports {
+class Monetization : public nsIMonetizationLoaderObserver {
  public:
   Monetization() = default;
 

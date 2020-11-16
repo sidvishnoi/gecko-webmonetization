@@ -104,10 +104,11 @@ LinkMonetization::DoUpdateMonetization(Document* aOldDocument,
   //   return Update{};
   // }
 
+  // TODO(sidvishnoi)
   // When static documents are created, stylesheets are cloned manually.
-  if (!mUpdatesEnabled || doc->IsStaticDocument()) {
-    return Update{};
-  }
+  // if (!mUpdatesEnabled || doc->IsStaticDocument()) {
+  //   return Update{};
+  // }
 
   Maybe<MonetizationInfo> info = GetMonetizationInfo();
   if (!aForceUpdate && mMonetization && info && info->mURI) {
