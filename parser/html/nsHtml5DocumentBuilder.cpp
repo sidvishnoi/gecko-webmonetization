@@ -8,6 +8,7 @@
 
 #include "mozilla/dom/ScriptLoader.h"
 #include "mozilla/dom/LinkStyle.h"
+#include "mozilla/dom/LinkMonetization.h"
 #include "nsNameSpaceManager.h"
 
 using mozilla::dom::LinkStyle;
@@ -44,6 +45,25 @@ void nsHtml5DocumentBuilder::SetDocumentCharsetAndSource(
   if (mDocument) {
     mDocument->SetDocumentCharacterSetSource(aCharsetSource);
     mDocument->SetDocumentCharacterSet(aEncoding);
+  }
+}
+
+void nsHtml5DocumentBuilder::UpdateMonetization(nsIContent* aElement) {
+  puts("🤑🕊 nsHtml5DocumentBuilder::UpdateMonetization");
+  using mozilla::dom::LinkMonetization;
+
+  auto linkMonetization = LinkMonetization::FromNode(*aElement);
+  if (!linkMonetization) {
+    return;
+  }
+
+  linkMonetization->SetEnableUpdates(true);
+  auto updateOrError =
+      linkMonetization->UpdateMonetization(mRunsToCompletion ? nullptr : this);
+  if (updateOrError.isOk()) {
+    puts("🤑🕊 nsHtml5DocumentBuilder::UpdateMonetization ok");
+  } else {
+    puts("🤑🕊 nsHtml5DocumentBuilder::UpdateMonetization oops");
   }
 }
 

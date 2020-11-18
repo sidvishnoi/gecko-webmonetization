@@ -101,6 +101,11 @@ class nsHtml5DocumentBuilder : public nsContentSink {
    */
   void UpdateStyleSheet(nsIContent* aElement);
 
+  /**
+   * Sets up monetization load / parse
+   */
+  void UpdateMonetization(nsIContent* aElement);
+
   void SetDocumentMode(nsHtml5DocumentMode m);
 
   void SetNodeInfoManager(nsNodeInfoManager* aManager) {

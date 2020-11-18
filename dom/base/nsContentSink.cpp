@@ -16,6 +16,7 @@
 #include "mozilla/StaticPrefs_content.h"
 #include "mozilla/dom/Document.h"
 #include "mozilla/dom/LinkStyle.h"
+#include "mozilla/dom/LinkMonetization.h"
 #include "mozilla/css/Loader.h"
 #include "mozilla/dom/MutationObservers.h"
 #include "mozilla/dom/SRILogHelper.h"
@@ -67,6 +68,7 @@ NS_IMPL_CYCLE_COLLECTING_RELEASE(nsContentSink)
 
 NS_INTERFACE_MAP_BEGIN_CYCLE_COLLECTION(nsContentSink)
   NS_INTERFACE_MAP_ENTRY(nsICSSLoaderObserver)
+  NS_INTERFACE_MAP_ENTRY(nsIMonetizationLoaderObserver)
   NS_INTERFACE_MAP_ENTRY(nsISupportsWeakReference)
   NS_INTERFACE_MAP_ENTRY(nsIDocumentObserver)
   NS_INTERFACE_MAP_ENTRY(nsIMutationObserver)
@@ -175,6 +177,13 @@ nsresult nsContentSink::Init(Document* aDoc, nsIURI* aURI,
     FavorPerformanceHint(!mDynamicLowerValue, 0);
   }
 
+  return NS_OK;
+}
+
+NS_IMETHODIMP
+nsContentSink::MonetizationLoaded(Monetization* aMonetization,
+                                  nsresult aStatus) {
+  puts("💸 HELLO");
   return NS_OK;
 }
 

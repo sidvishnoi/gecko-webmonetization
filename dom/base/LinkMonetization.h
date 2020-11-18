@@ -24,6 +24,7 @@ namespace mozilla::dom {
 class Monetization : public nsIMonetizationLoaderObserver {
  public:
   Monetization() = default;
+  ~Monetization() = default;
 
   bool IsComplete() { return false; }
   void RemoveMonetization(Monetization&){};
@@ -36,8 +37,6 @@ class Monetization : public nsIMonetizationLoaderObserver {
  protected:
   static void Traverse(nsCycleCollectionTraversalCallback& cb) {}
   static void Unlink() {}
-
-  ~Monetization() = default;
 };
 
 class Document;

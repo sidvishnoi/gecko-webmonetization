@@ -152,6 +152,8 @@ nsHtml5TreeOperation::~nsHtml5TreeOperation() {
 
     void operator()(const opCharsetSwitchTo& aOperation) {}
 
+    void operator()(const opUpdateMonetization& aOperation) {}
+
     void operator()(const opUpdateStyleSheet& aOperation) {}
 
     void operator()(const opProcessOfflineManifest& aOperation) {
@@ -964,6 +966,11 @@ nsresult nsHtml5TreeOperation::Perform(nsHtml5TreeOpExecutor* aBuilder,
 
     nsresult operator()(const opUpdateStyleSheet& aOperation) {
       mBuilder->UpdateStyleSheet(*(aOperation.mElement));
+      return NS_OK;
+    }
+
+    nsresult operator()(const opUpdateMonetization& aOperation) {
+      mBuilder->UpdateMonetization(*(aOperation.mElement));
       return NS_OK;
     }
 

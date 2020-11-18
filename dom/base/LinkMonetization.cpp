@@ -137,6 +137,11 @@ LinkMonetization::DoUpdateMonetization(Document* aOldDocument,
   }
 
   printf("🤑 Monetization: %s\n", info->mURI->GetSpecOrDefault().get());
+  printf("aObserver: %p\n", aObserver);
+  if (aObserver) {
+    nsresult rv{};
+    aObserver->MonetizationLoaded(nullptr, rv);
+  }
   return Update{};
   // auto resultOrError = doc->CSSLoader()->LoadStyleLink(*info, aObserver);
   // if (resultOrError.isErr()) {

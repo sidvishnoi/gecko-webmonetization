@@ -15,6 +15,7 @@
 // Base class for contentsink implementations.
 
 #include "mozilla/Attributes.h"
+#include "mozilla/dom/nsIMonetizationLoaderObserver.h"
 #include "nsICSSLoaderObserver.h"
 #include "nsWeakReference.h"
 #include "nsCOMPtr.h"
@@ -74,6 +75,7 @@ extern mozilla::LazyLogModule gContentSinkLogModuleInfo;
 //----------------------------------------------------------------------
 
 class nsContentSink : public nsICSSLoaderObserver,
+                      public nsIMonetizationLoaderObserver,
                       public nsSupportsWeakReference,
                       public nsStubDocumentObserver,
                       public nsITimerCallback,
@@ -88,6 +90,10 @@ class nsContentSink : public nsICSSLoaderObserver,
   NS_DECL_NSITIMERCALLBACK
 
   NS_DECL_NSINAMED
+
+  // nsIMonetizationLoaderObserver
+  NS_IMETHOD MonetizationLoaded(mozilla::dom::Monetization* aMonetization,
+                                nsresult aStatus) override;
 
   // nsICSSLoaderObserver
   NS_IMETHOD StyleSheetLoaded(mozilla::StyleSheet* aSheet, bool aWasDeferred,

@@ -354,6 +354,14 @@ struct opUpdateStyleSheet {
   };
 };
 
+struct opUpdateMonetization {
+  nsIContent** mElement;
+
+  explicit opUpdateMonetization(nsIContentHandle* aElement) {
+    mElement = static_cast<nsIContent**>(aElement);
+  };
+};
+
 struct opProcessOfflineManifest {
   char16_t* mUrl;
 
@@ -492,11 +500,11 @@ typedef mozilla::Variant<
     opMarkAsBroken, opRunScript, opRunScriptAsyncDefer,
     opPreventScriptExecution, opDoneAddingChildren, opDoneCreatingElement,
     opSetDocumentCharset, opCharsetSwitchTo, opUpdateStyleSheet,
-    opProcessOfflineManifest, opMarkMalformedIfScript, opStreamEnded,
-    opSetStyleLineNumber, opSetScriptLineNumberAndFreeze, opSvgLoad,
-    opMaybeComplainAboutCharset, opMaybeComplainAboutDeepTree, opAddClass,
-    opAddViewSourceHref, opAddViewSourceBase, opAddErrorType, opAddLineNumberId,
-    opStartLayout, opEnableEncodingMenu>
+    opUpdateMonetization, opProcessOfflineManifest, opMarkMalformedIfScript,
+    opStreamEnded, opSetStyleLineNumber, opSetScriptLineNumberAndFreeze,
+    opSvgLoad, opMaybeComplainAboutCharset, opMaybeComplainAboutDeepTree,
+    opAddClass, opAddViewSourceHref, opAddViewSourceBase, opAddErrorType,
+    opAddLineNumberId, opStartLayout, opEnableEncodingMenu>
     treeOperation;
 
 class nsHtml5TreeOperation final {
