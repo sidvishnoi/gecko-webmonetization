@@ -13,6 +13,11 @@ ChromeUtils.defineModuleGetter(
   "FaviconLoader",
   "resource:///modules/FaviconLoader.jsm"
 );
+ChromeUtils.defineModuleGetter(
+  this,
+  "MonetizationLoader",
+  "resource:///modules/MonetizationLoader.jsm"
+);
 
 class LinkHandlerChild extends JSWindowActorChild {
   constructor() {
@@ -20,6 +25,14 @@ class LinkHandlerChild extends JSWindowActorChild {
 
     this.seenTabIcon = false;
     this._iconLoader = null;
+    this._monetizationLoader = null;
+  }
+
+  get monetizationLoader() {
+    if (!this._monetizationLoader) {
+      this._monetizationLoader = new MonetizationLoader(this);
+    }
+    return this._monetizationLoader;
   }
 
   get iconLoader() {
@@ -59,6 +72,7 @@ class LinkHandlerChild extends JSWindowActorChild {
     if (this._iconLoader) {
       this._iconLoader.onPageShow();
     }
+    this._monetizationLoader?.onPageShow(this.document);
   }
 
   onPageShow(event) {
@@ -71,6 +85,8 @@ class LinkHandlerChild extends JSWindowActorChild {
     if (this._iconLoader) {
       this._iconLoader.onPageShow();
     }
+
+    this._monetizationLoader?.onPageShow(this.document);
   }
 
   onPageHide(event) {
@@ -81,8 +97,27 @@ class LinkHandlerChild extends JSWindowActorChild {
     if (this._iconLoader) {
       this._iconLoader.onPageHide();
     }
-
     this.seenTabIcon = false;
+
+    this._monetizationLoader?.onPageHide(this.document);
+  }
+
+  onVisibilityChange(event) {
+    if (
+      event.target != this.document ||
+      this.document.ownerGlobal != this.contentWindow
+    ) {
+      // Verify if these cases are even possible.
+      return;
+    }
+
+    // TODO: there must be a better way t
+    const url = this.document.location;
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      return;
+    }
+
+    this.monetizationLoader.onVisbilityChange(this.document);
   }
 
   onLinkEvent(event) {
@@ -161,6 +196,9 @@ class LinkHandlerChild extends JSWindowActorChild {
             }
           }
           break;
+        case "monetization":
+          this.monetizationLoader.onLinkEvent(link.ownerDocument);
+          break;
       }
     }
   }
@@ -171,6 +209,8 @@ class LinkHandlerChild extends JSWindowActorChild {
         return this.onPageShow(event);
       case "pagehide":
         return this.onPageHide(event);
+      case "visibilitychange":
+        return this.onVisibilityChange(event);
       case "DOMHeadElementParsed":
         return this.onHeadParsed(event);
       default:

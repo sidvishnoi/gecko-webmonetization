@@ -137,6 +137,7 @@ EXTRA_JS_MODULES += [
     "FaviconLoader.jsm",
     "HomePage.jsm",
     "LaterRun.jsm",
+    "MonetizationLoader.jsm",
     "NewTabPagePreloading.jsm",
     "OpenInTabsUtils.jsm",
     "PageActions.jsm",

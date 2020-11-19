@@ -98,6 +98,13 @@ class LinkHandlerParent extends JSWindowActorParent {
           );
         }
         break;
+
+      case "Link:SetMonetization":
+      case "Link:SetFailedMonetization":
+      case "Link:UnsetMonetization": {
+        console.info(aMsg.name, aMsg.data);
+        break;
+      }
     }
   }
 
