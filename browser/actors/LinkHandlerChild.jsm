@@ -13,6 +13,11 @@ ChromeUtils.defineModuleGetter(
   "FaviconLoader",
   "resource:///modules/FaviconLoader.jsm"
 );
+ChromeUtils.defineModuleGetter(
+  this,
+  "MonetizationLoader",
+  "resource:///modules/MonetizationLoader.jsm"
+);
 
 class LinkHandlerChild extends JSWindowActorChild {
   constructor() {
@@ -20,6 +25,14 @@ class LinkHandlerChild extends JSWindowActorChild {
 
     this.seenTabIcon = false;
     this._iconLoader = null;
+    this._monetizationLoader = null;
+  }
+
+  get monetizationLoader() {
+    if (!this._monetizationLoader) {
+      this._monetizationLoader = new MonetizationLoader(this);
+    }
+    return this._monetizationLoader;
   }
 
   get iconLoader() {
@@ -59,6 +72,9 @@ class LinkHandlerChild extends JSWindowActorChild {
     if (this._iconLoader) {
       this._iconLoader.onPageShow();
     }
+    if (this._monetizationLoader) {
+      this._monetizationLoader.onPageShow();
+    }
   }
 
   onPageShow(event) {
@@ -71,6 +87,9 @@ class LinkHandlerChild extends JSWindowActorChild {
     if (this._iconLoader) {
       this._iconLoader.onPageShow();
     }
+    if (this._monetizationLoader) {
+      this._monetizationLoader.onPageShow();
+    }
   }
 
   onPageHide(event) {
@@ -80,6 +99,9 @@ class LinkHandlerChild extends JSWindowActorChild {
 
     if (this._iconLoader) {
       this._iconLoader.onPageHide();
+    }
+    if (this._monetizationLoader) {
+      this._monetizationLoader.onPageHide();
     }
 
     this.seenTabIcon = false;
@@ -103,6 +125,7 @@ class LinkHandlerChild extends JSWindowActorChild {
     // whole content
     let iconAdded = false;
     let searchAdded = false;
+    let monetizationAdded = false;
     let rels = {};
     for (let relString of rel.split(/\s+/)) {
       rels[relString] = true;
@@ -159,6 +182,12 @@ class LinkHandlerChild extends JSWindowActorChild {
               });
               searchAdded = true;
             }
+          }
+          break;
+        case "monetization":
+          if (monetizationAdded) break;
+          if (this.monetizationLoader.addPaymentInfoFromLink(link)) {
+            monetizationAdded = true;
           }
           break;
       }
