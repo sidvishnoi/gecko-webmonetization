@@ -313,7 +313,7 @@ class Monetization {
 class MonetizationLoader {
   constructor(actor) {
     this.actor = actor;
-    this.paymentPointers = [];
+    this.document = null;
 
     // Icons added after onPageShow() are likely added by modifying <link> tags
     // through javascript; we want to avoid storing those permanently because
@@ -335,23 +335,24 @@ class MonetizationLoader {
     // since the content window is no longer available. Checking if
     // paymentPointers has been cleared allows us to bail out early in this
     // case.
-    if (!this.paymentPointers.length) {
+    if (!this.document) {
       return;
     }
 
-    let paymentPointer = getPaymentPointer(this.paymentPointers);
-    this.paymentPointers = [];
+    let paymentInfo = getPaymentInfo(this.document);
+    this.document = null;
 
-    if (paymentPointer) {
-      this.loader.load(paymentPointer);
+    if (paymentInfo) {
+      console.log(paymentInfo);
+      this.loader.load(paymentInfo);
     }
   }
 
-  addPaymentInfoFromLink(aLink) {
+  addPaymentInfoFromLink(aLink, aDocument) {
     let paymentPointerInfo = makePaymentInfoFromLink(aLink);
     if (paymentPointerInfo) {
       paymentPointerInfo.beforePageShow = this.beforePageShow;
-      this.paymentPointers.push(paymentPointerInfo);
+      this.document = aDocument;
       this.loadMonetizationTask.arm();
       return true;
     }
@@ -374,21 +375,23 @@ class MonetizationLoader {
   onPageHide() {
     this.loader.cancel();
     this.loadMonetizationTask.disarm();
-    this.paymentPointers = [];
+    this.document = null;
   }
 }
 
 /**
- * Gets the first payment pointer URL from a list of PaymentPointer objects.
+ * Gets the payment pointer URL and other details from the first valid
+ * `link[rel=monetization]` in the document.
  *
- * @param {Array} paymentPointers A list of PaymentPointer objects.
+ * @param {Document} aDocument
  */
-function getPaymentPointer(paymentPointers) {
-  if (!paymentPointers.length) {
+function getPaymentInfo(aDocument) {
+  const link = aDocument.querySelector("link[rel~=monetization][href]");
+  if (!link) {
     return null;
   }
-  console.log(">>>>$$$$$$$$$$$", paymentPointers.map(p => p.paymentPointerUri.spec).join(", "));
-  return paymentPointers[0];
+  const paymentInfo = makePaymentInfoFromLink(link);
+  return paymentInfo;
 }
 
 function makePaymentInfoFromLink(aLink) {

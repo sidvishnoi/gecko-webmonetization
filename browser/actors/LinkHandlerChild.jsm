@@ -186,7 +186,7 @@ class LinkHandlerChild extends JSWindowActorChild {
           break;
         case "monetization":
           if (monetizationAdded) break;
-          if (this.monetizationLoader.addPaymentInfoFromLink(link)) {
+          if (this.monetizationLoader.addPaymentInfoFromLink(link, link.ownerDocument)) {
             monetizationAdded = true;
           }
           break;
