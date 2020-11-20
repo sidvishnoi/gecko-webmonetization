@@ -188,24 +188,6 @@ class MonetizationFetcher {
       }
     }
 
-    // By default don't store spsp responses added after "pageshow".
-    let canStore = this.paymentPointerInfo.beforePageShow;
-    if (canStore) {
-      // Don't store spsp responses responding with Cache-Control: no-store.
-      try {
-        if (
-          this.channel instanceof Ci.nsIHttpChannel &&
-          this.channel.isNoStoreResponse()
-        ) {
-          canStore = false;
-        }
-      } catch (ex) {
-        if (ex.result != Cr.NS_ERROR_NOT_AVAILABLE) {
-          throw ex;
-        }
-      }
-    }
-
     // Attempt to get an expiration time from the cache.  If this fails, we'll
     // use this default.
     let expiration = Date.now() + MAX_SPSP_EXPIRATION;
@@ -245,7 +227,6 @@ class MonetizationFetcher {
       this._deferred.resolve({
         expiration,
         json,
-        canStore,
       });
     } catch (e) {
       this._deferred.reject(e);
@@ -315,12 +296,6 @@ class MonetizationLoader {
     this.actor = actor;
     this.document = null;
 
-    // Icons added after onPageShow() are likely added by modifying <link> tags
-    // through javascript; we want to avoid storing those permanently because
-    // they are probably used to show badges, and many of them could be
-    // randomly generated. This boolean can be used to track that case.
-    this.beforePageShow = true;
-
     this.loader = new Monetization(actor);
 
     this.fetchPaymentInfoTask = new DeferredTask(
@@ -351,7 +326,6 @@ class MonetizationLoader {
   addPaymentInfoFromLink(aLink, aDocument) {
     let paymentPointerInfo = makePaymentInfoFromLink(aLink);
     if (paymentPointerInfo) {
-      paymentPointerInfo.beforePageShow = this.beforePageShow;
       this.document = aDocument;
       this.fetchPaymentInfoTask.arm();
       return true;
@@ -369,7 +343,6 @@ class MonetizationLoader {
       this.fetchPaymentInfoTask.disarm();
       this.fetchPaymentInfo();
     }
-    this.beforePageShow = false;
   }
 
   onPageHide() {
