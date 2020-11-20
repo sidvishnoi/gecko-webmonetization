@@ -35,7 +35,7 @@ const MAX_SPSP_EXPIRATION = 0;
 
 const ALLOWED_MIME_TYPES = ["application/spsp4+json", "application/spsp+json", "application/json"];
 
-class FaviconLoad {
+class MonetizationFetcher {
   /**
    * @param {ReturnType<typeof makePaymentInfoFromLink>} paymentPointerInfo
    */
@@ -107,7 +107,7 @@ class FaviconLoad {
     }
   }
 
-  load() {
+  fetch() {
     this._deferred = PromiseUtils.defer();
 
     // Clear the references when we succeed or fail.
@@ -266,8 +266,8 @@ class Monetization {
   }
 
   async load(paymentPointerInfo) {
-    if (this._loader) {
-      this._loader.cancel();
+    if (this._fetcher) {
+      this._fetcher.cancel();
     }
 
     // // Let the main process that a tab icon is possibly coming.
@@ -277,8 +277,8 @@ class Monetization {
     // });
 
     try {
-      this._loader = new FaviconLoad(paymentPointerInfo);
-      let { dataURL, expiration } = await this._loader.load();
+      this._fetcher = new MonetizationFetcher(paymentPointerInfo);
+      let { dataURL, expiration } = await this._fetcher.fetch();
 
       // this.actor.sendAsyncMessage("Link:SetIcon", {
       //   pageURL: paymentPointerInfo.pageUri.spec,
@@ -296,17 +296,17 @@ class Monetization {
       //   });
       // }
     } finally {
-      this._loader = null;
+      this._fetcher = null;
     }
   }
 
   cancel() {
-    if (!this._loader) {
+    if (!this._fetcher) {
       return;
     }
 
-    this._loader.cancel();
-    this._loader = null;
+    this._fetcher.cancel();
+    this._fetcher = null;
   }
 }
 
@@ -323,13 +323,13 @@ class MonetizationLoader {
 
     this.loader = new Monetization(actor);
 
-    this.loadMonetizationTask = new DeferredTask(
-      () => this.loadPaymentPointers(),
+    this.fetchPaymentInfoTask = new DeferredTask(
+      () => this.fetchPaymentInfo(),
       MM_PARSING_TIMEOUT
     );
   }
 
-  loadPaymentPointers() {
+  fetchPaymentInfo() {
     // If the page is unloaded immediately after the DeferredTask's timer fires
     // we can still attempt to fetch from payment pointers URLs, which will fail
     // since the content window is no longer available. Checking if
@@ -353,7 +353,7 @@ class MonetizationLoader {
     if (paymentPointerInfo) {
       paymentPointerInfo.beforePageShow = this.beforePageShow;
       this.document = aDocument;
-      this.loadMonetizationTask.arm();
+      this.fetchPaymentInfoTask.arm();
       return true;
     }
     return false;
@@ -365,16 +365,16 @@ class MonetizationLoader {
 
   onPageShow() {
     // We're likely done with icon parsing so load the pending icons now.
-    if (this.loadMonetizationTask.isArmed) {
-      this.loadMonetizationTask.disarm();
-      this.loadPaymentPointers();
+    if (this.fetchPaymentInfoTask.isArmed) {
+      this.fetchPaymentInfoTask.disarm();
+      this.fetchPaymentInfo();
     }
     this.beforePageShow = false;
   }
 
   onPageHide() {
     this.loader.cancel();
-    this.loadMonetizationTask.disarm();
+    this.fetchPaymentInfoTask.disarm();
     this.document = null;
   }
 }
