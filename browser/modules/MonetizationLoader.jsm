@@ -333,29 +333,12 @@ class MonetizationLoader {
     return false;
   }
 
-  addDefaultIcon(pageUri) {
-    // this.loadMonetizationTask.arm();
-  }
-
-  onPageShow() {
-    // We're likely done with icon parsing so load the pending icons now.
-    if (this.fetchPaymentInfoTask.isArmed) {
-      this.fetchPaymentInfoTask.disarm();
-      this.fetchPaymentInfo();
-    }
-  }
-
-  onPageHide() {
-    this.loader.cancel();
-    this.fetchPaymentInfoTask.disarm();
-    this.document = null;
-  }
-
   setPaymentInfo(aInfo) {
     if (isSame(this.currentPaymentInfo, aInfo)) {
       return false;
     } else {
       this.currentPaymentInfo = aInfo;
+      console.info(aInfo ? "Start monetization" : "Stop monetization");
       return true;
     }
   }
@@ -373,6 +356,21 @@ class MonetizationLoader {
     }
     const paymentInfo = makePaymentInfoFromLink(link);
     return paymentInfo;
+  }
+
+  onPageShow() {
+    if (this.fetchPaymentInfoTask.isArmed) {
+      this.fetchPaymentInfoTask.disarm();
+      this.fetchPaymentInfo();
+    }
+  }
+
+  // TODO: fix a leak here
+  onPageHide() {
+    this.loader.cancel();
+    this.fetchPaymentInfoTask.disarm();
+    this.document = null;
+    this.setPaymentInfo(null);
   }
 }
 
