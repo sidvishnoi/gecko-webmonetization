@@ -317,16 +317,15 @@ class MonetizationLoader {
     let paymentInfo = getPaymentInfo(this.document);
     this.document = null;
 
+    console.dir(paymentInfo);
     if (paymentInfo) {
-      console.log(paymentInfo);
       this.loader.load(paymentInfo);
     }
   }
 
-  addPaymentInfoFromLink(aLink, aDocument) {
-    let paymentPointerInfo = makePaymentInfoFromLink(aLink);
-    if (paymentPointerInfo) {
-      this.document = aDocument;
+  tryUpdatePaymentInfo(aDocument) {
+    this.document = aDocument;
+    if (getPaymentInfo(aDocument)) {
       this.fetchPaymentInfoTask.arm();
       return true;
     }

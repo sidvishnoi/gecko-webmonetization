@@ -125,7 +125,6 @@ class LinkHandlerChild extends JSWindowActorChild {
     // whole content
     let iconAdded = false;
     let searchAdded = false;
-    let monetizationAdded = false;
     let rels = {};
     for (let relString of rel.split(/\s+/)) {
       rels[relString] = true;
@@ -185,10 +184,7 @@ class LinkHandlerChild extends JSWindowActorChild {
           }
           break;
         case "monetization":
-          if (monetizationAdded) break;
-          if (this.monetizationLoader.addPaymentInfoFromLink(link, link.ownerDocument)) {
-            monetizationAdded = true;
-          }
+          this.monetizationLoader.tryUpdatePaymentInfo(link.ownerDocument);
           break;
       }
     }
