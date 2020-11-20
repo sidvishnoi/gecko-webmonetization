@@ -246,7 +246,8 @@ class Monetization {
     this.actor = actor;
   }
 
-  async load(paymentPointerInfo) {
+  async start(paymentPointerInfo) {
+    console.info("🔵 Start Monetization", this.actor.contentWindow.location.href);
     console.log('Fetch', paymentPointerInfo.paymentPointerUri.spec);
     if (this._fetcher) {
       this._fetcher.cancel();
@@ -280,6 +281,11 @@ class Monetization {
     } finally {
       this._fetcher = null;
     }
+  }
+
+  stop() {
+    this.cancel();
+    console.info("🔴 Stop monetization", this.actor.contentWindow.location.href);
   }
 
   cancel() {
@@ -318,7 +324,7 @@ class MonetizationLoader {
     let paymentInfo = this.getPaymentInfo(this.document);
     this.document = null;
     if (this.setPaymentInfo(paymentInfo)) {
-      this.loader.load(paymentInfo);
+      this.loader.start(paymentInfo);
     }
   }
 
@@ -338,7 +344,9 @@ class MonetizationLoader {
       return false;
     } else {
       this.currentPaymentInfo = aInfo;
-      console.info(aInfo ? "Start monetization" : "Stop monetization");
+      if (!aInfo) {
+        this.loader.stop();
+      }
       return true;
     }
   }
