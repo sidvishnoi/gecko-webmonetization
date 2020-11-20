@@ -247,6 +247,7 @@ class Monetization {
   }
 
   async load(paymentPointerInfo) {
+    console.log('Fetch', paymentPointerInfo.paymentPointerUri.spec);
     if (this._fetcher) {
       this._fetcher.cancel();
     }
@@ -295,6 +296,7 @@ class MonetizationLoader {
   constructor(actor) {
     this.actor = actor;
     this.document = null;
+    this.currentPaymentInfo = null;
 
     this.loader = new Monetization(actor);
 
@@ -307,27 +309,26 @@ class MonetizationLoader {
   fetchPaymentInfo() {
     // If the page is unloaded immediately after the DeferredTask's timer fires
     // we can still attempt to fetch from payment pointers URLs, which will fail
-    // since the content window is no longer available. Checking if
-    // paymentPointers has been cleared allows us to bail out early in this
-    // case.
+    // since the content window is no longer available. This check allows us to
+    // bail out early in this case.
     if (!this.document) {
       return;
     }
 
-    let paymentInfo = getPaymentInfo(this.document);
+    let paymentInfo = this.getPaymentInfo(this.document);
     this.document = null;
-
-    console.dir(paymentInfo);
-    if (paymentInfo) {
+    if (this.setPaymentInfo(paymentInfo)) {
       this.loader.load(paymentInfo);
     }
   }
 
   tryUpdatePaymentInfo(aDocument) {
     this.document = aDocument;
-    if (getPaymentInfo(aDocument)) {
+    if (this.getPaymentInfo(aDocument)) {
       this.fetchPaymentInfoTask.arm();
       return true;
+    } else if (this.currentPaymentInfo) {
+      this.setPaymentInfo(null);
     }
     return false;
   }
@@ -349,22 +350,32 @@ class MonetizationLoader {
     this.fetchPaymentInfoTask.disarm();
     this.document = null;
   }
+
+  setPaymentInfo(aInfo) {
+    if (isSame(this.currentPaymentInfo, aInfo)) {
+      return false;
+    } else {
+      this.currentPaymentInfo = aInfo;
+      return true;
+    }
+  }
+
+  /**
+   * Gets the payment pointer URL and other details from the first valid
+   * `link[rel=monetization]` in the document.
+   *
+   * @param {Document} aDocument
+   */
+  getPaymentInfo() {
+    const link = this.document.head.querySelector("link[rel~=monetization][href]");
+    if (!link) {
+      return null;
+    }
+    const paymentInfo = makePaymentInfoFromLink(link);
+    return paymentInfo;
+  }
 }
 
-/**
- * Gets the payment pointer URL and other details from the first valid
- * `link[rel=monetization]` in the document.
- *
- * @param {Document} aDocument
- */
-function getPaymentInfo(aDocument) {
-  const link = aDocument.querySelector("link[rel~=monetization][href]");
-  if (!link) {
-    return null;
-  }
-  const paymentInfo = makePaymentInfoFromLink(link);
-  return paymentInfo;
-}
 
 function makePaymentInfoFromLink(aLink) {
   let paymentPointerUri = getLinkURI(aLink);
@@ -397,4 +408,8 @@ function getLinkURI(aLink) {
     // some URIs are immutable
   }
   return uri;
+}
+
+function isSame(aInfoA, aInfoB) {
+  return aInfoA && aInfoB && aInfoB.paymentPointerUri.equals(aInfoA.paymentPointerUri) && aInfoB.node === aInfoA.node;
 }

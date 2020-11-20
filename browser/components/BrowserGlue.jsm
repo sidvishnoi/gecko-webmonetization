@@ -522,6 +522,7 @@ let JSWINDOWACTORS = {
         DOMHeadElementParsed: {},
         DOMLinkAdded: {},
         DOMLinkChanged: {},
+        DOMLinkRemoved: {},
         pageshow: {},
         pagehide: {},
       },
