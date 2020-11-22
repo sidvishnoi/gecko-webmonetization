@@ -38,6 +38,12 @@ const BinaryInputStream = Components.Constructor(
   "setInputStream"
 );
 
+const ReferrerInfo = Components.Constructor(
+  "@mozilla.org/referrer-info;1",
+  "nsIReferrerInfo",
+  "init"
+);
+
 const MM_PARSING_TIMEOUT = 100;
 
 // TODO: should we cache response if cache-control is not specified or not?
@@ -77,20 +83,16 @@ class MonetizationFetcher {
       Ci.nsIContentPolicy.TYPE_OTHER,
     );
 
-    // TODO: hide referrer as per spec
     if (this.channel instanceof Ci.nsIHttpChannel) {
-      this.channel.QueryInterface(Ci.nsIHttpChannel);
-      let referrerInfo = Cc["@mozilla.org/referrer-info;1"].createInstance(
-        Ci.nsIReferrerInfo
+      // this.channel.QueryInterface(Ci.nsIHttpChannel);
+      this.channel.setRequestHeader(
+        "Accept",
+        "application/spsp4+json, application/spsp+json",
+        false
       );
-      // Sometimes node is a document and sometimes it is an element. We need
-      // to set the referrer info correctly either way.
-      if (paymentPointerInfo.node.nodeType == paymentPointerInfo.node.DOCUMENT_NODE) {
-        referrerInfo.initWithDocument(paymentPointerInfo.node);
-      } else {
-        referrerInfo.initWithElement(paymentPointerInfo.node);
-      }
-      this.channel.referrerInfo = referrerInfo;
+      this.channel.referrerInfo = new ReferrerInfo(
+        Ci.nsIReferrerInfo.NO_REFERRER,
+      );
     }
 
     this.channel.loadFlags |=
