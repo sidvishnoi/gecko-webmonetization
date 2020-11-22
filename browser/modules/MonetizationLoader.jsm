@@ -229,6 +229,7 @@ class MonetizationFetcher {
         json,
       });
     } catch (e) {
+      Cu.reportError(e);
       this._deferred.reject(e);
     }
   }
