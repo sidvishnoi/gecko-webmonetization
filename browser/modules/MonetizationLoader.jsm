@@ -27,6 +27,16 @@ const StorageStream = Components.Constructor(
   "nsIStorageStream",
   "init"
 );
+const BufferedOutputStream = Components.Constructor(
+  "@mozilla.org/network/buffered-output-stream;1",
+  "nsIBufferedOutputStream",
+  "init"
+);
+const BinaryInputStream = Components.Constructor(
+  "@mozilla.org/binaryinputstream;1",
+  "nsIBinaryInputStream",
+  "setInputStream"
+);
 
 const MM_PARSING_TIMEOUT = 100;
 
@@ -114,10 +124,16 @@ class MonetizationFetcher {
     let cleanup = () => {
       this.channel = null;
       this.dataBuffer = null;
+      this.stream = null;
     };
     this._deferred.promise.then(cleanup, cleanup);
 
     this.dataBuffer = new StorageStream(STREAM_SEGMENT_SIZE, PR_UINT32_MAX);
+    // StorageStream does not implement writeFrom so wrap it with a buffered stream.
+    this.stream = new BufferedOutputStream(
+      this.dataBuffer.getOutputStream(0),
+      STREAM_SEGMENT_SIZE * 2
+    );
 
     try {
       this.channel.asyncOpen(this);
@@ -139,6 +155,7 @@ class MonetizationFetcher {
   onStartRequest(request) { }
 
   onDataAvailable(request, inputStream, offset, count) {
+    this.stream.writeFrom(inputStream, count);
   }
 
   asyncOnChannelRedirect(oldChannel, newChannel, flags, callback) {
@@ -156,6 +173,8 @@ class MonetizationFetcher {
       return;
     }
 
+    this.stream.close();
+    this.stream = null;
 
     if (!Components.isSuccessCode(statusCode)) {
       if (statusCode == Cr.NS_BINDING_ABORTED) {
@@ -212,9 +231,12 @@ class MonetizationFetcher {
 
       let json;
       try {
-        let buffer = new ArrayBuffer(this.dataBuffer.length);
         // TODO: see if there is more efficient way to do this.
+        const stream = new BinaryInputStream(this.dataBuffer.newInputStream(0));
+        const buffer = new ArrayBuffer(this.dataBuffer.length);
+        stream.readArrayBuffer(buffer.byteLength, buffer);
         let str = String.fromCharCode.apply(null, new Uint8Array(buffer));
+
         // TODO: maybe we should only extract supported fields from response.
         json = JSON.parse(str);
       } catch (e) {
