@@ -84,7 +84,6 @@ class MonetizationFetcher {
     );
 
     if (this.channel instanceof Ci.nsIHttpChannel) {
-      // this.channel.QueryInterface(Ci.nsIHttpChannel);
       this.channel.setRequestHeader(
         "Accept",
         "application/spsp4+json, application/spsp+json",
@@ -248,9 +247,18 @@ class MonetizationFetcher {
         );
       }
 
+      if (!json.destination_account || !json.shared_secret) {
+        throw Components.Exception(
+          `Monetization response at "${this.paymentPointerInfo.paymentPointerUri.spec}" does not have required fields.`,
+          Cr.NS_ERROR_FAILURE
+        );
+      }
+
       this._deferred.resolve({
         expiration,
-        json,
+        destinationAccount: json.destination_account,
+        sharedSecret: json.shared_secret,
+        receiptsEnabled: json.receipts_enabled,
       });
     } catch (e) {
       Cu.reportError(e);
@@ -286,7 +294,8 @@ class Monetization {
 
     try {
       this._fetcher = new MonetizationFetcher(paymentPointerInfo);
-      let { dataURL, expiration } = await this._fetcher.fetch();
+      let response = await this._fetcher.fetch();
+      console.log(response);
 
       // this.actor.sendAsyncMessage("Link:SetIcon", {
       //   pageURL: paymentPointerInfo.pageUri.spec,
