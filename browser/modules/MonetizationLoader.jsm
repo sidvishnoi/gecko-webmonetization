@@ -46,9 +46,6 @@ const ReferrerInfo = Components.Constructor(
 
 const MM_PARSING_TIMEOUT = 100;
 
-// TODO: should we cache response if cache-control is not specified or not?
-const MAX_SPSP_EXPIRATION = 0;
-
 const ALLOWED_MIME_TYPES = ["application/spsp4+json", "application/spsp+json", "application/json"];
 
 class MonetizationFetcher {
@@ -208,19 +205,6 @@ class MonetizationFetcher {
       }
     }
 
-    // Attempt to get an expiration time from the cache.  If this fails, we'll
-    // use this default.
-    let expiration = Date.now() + MAX_SPSP_EXPIRATION;
-    // This stuff isn't available after onStopRequest returns (so don't start
-    // any async operations before this!).
-    if (this.channel instanceof Ci.nsICacheInfoChannel) {
-      try {
-        expiration = this.channel.cacheTokenExpirationTime * 1000;
-      } catch (e) {
-        // Ignore failures to get the expiration time.
-      }
-    }
-
     try {
       let type = this.channel.contentType;
       if (!ALLOWED_MIME_TYPES.includes(type)) {
@@ -255,7 +239,6 @@ class MonetizationFetcher {
       }
 
       this._deferred.resolve({
-        expiration,
         destinationAccount: json.destination_account,
         sharedSecret: json.shared_secret,
         receiptsEnabled: json.receipts_enabled,
