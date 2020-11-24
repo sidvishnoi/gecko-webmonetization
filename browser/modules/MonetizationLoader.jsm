@@ -279,8 +279,11 @@ class Monetization {
     this.actor = actor;
   }
 
+  /**
+   * @param {ReturnType<typeof makePaymentInfoFromLink>} paymentPointerInfo
+   */
   async start(paymentPointerInfo) {
-    console.info("🔵 Start Monetization", this.actor.contentWindow.location.href);
+    console.info("🔵 Start Monetization", paymentPointerInfo.pageUri.spec);
     console.log('Fetch', paymentPointerInfo.paymentPointerUri.spec);
     if (this._fetcher) {
       this._fetcher.cancel();
