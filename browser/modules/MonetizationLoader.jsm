@@ -19,9 +19,6 @@ ChromeUtils.defineModuleGetter(
   "resource://gre/modules/PromiseUtils.jsm"
 );
 
-const STREAM_SEGMENT_SIZE = 4096;
-// TODO: do we need to this large response?
-const PR_UINT32_MAX = 0xffffffff;
 const StorageStream = Components.Constructor(
   "@mozilla.org/storagestream;1",
   "nsIStorageStream",
@@ -37,16 +34,24 @@ const BinaryInputStream = Components.Constructor(
   "nsIBinaryInputStream",
   "setInputStream"
 );
-
 const ReferrerInfo = Components.Constructor(
   "@mozilla.org/referrer-info;1",
   "nsIReferrerInfo",
   "init"
 );
 
-const MM_PARSING_TIMEOUT = 100;
+// For fetching the monetization response.
+// TODO: how large this should be? spsp response are generally around 100-200 chars.
+const STREAM_SEGMENT_SIZE = 4096;
+const PR_UINT32_MAX = 0xffffffff;
 
-const ALLOWED_MIME_TYPES = ["application/spsp4+json", "application/spsp+json", "application/json"];
+const DEFER_TASK_TIMEOUT = 100;
+
+const ALLOWED_MIME_TYPES = [
+  "application/spsp4+json",
+  "application/spsp+json",
+  "application/json",
+];
 
 class MonetizationFetcher {
   /**
@@ -77,7 +82,7 @@ class MonetizationFetcher {
       // nsILoadInfo for JSON?
       securityFlags | Ci.nsILoadInfo.SEC_DISALLOW_SCRIPT,
       // TODO: provide proper nsIContentPolicy
-      Ci.nsIContentPolicy.TYPE_OTHER,
+      Ci.nsIContentPolicy.TYPE_OTHER
     );
 
     if (this.channel instanceof Ci.nsIHttpChannel) {
@@ -87,7 +92,7 @@ class MonetizationFetcher {
         false
       );
       this.channel.referrerInfo = new ReferrerInfo(
-        Ci.nsIReferrerInfo.NO_REFERRER,
+        Ci.nsIReferrerInfo.NO_REFERRER
       );
     }
 
@@ -150,7 +155,7 @@ class MonetizationFetcher {
     this.channel.cancel(Cr.NS_BINDING_ABORTED);
   }
 
-  onStartRequest(request) { }
+  onStartRequest(request) {}
 
   onDataAvailable(request, inputStream, offset, count) {
     this.stream.writeFrom(inputStream, count);
@@ -316,7 +321,7 @@ class MonetizationLoader {
 
     this.fetchPaymentInfoTask = new DeferredTask(
       () => this.fetchPaymentInfo(),
-      MM_PARSING_TIMEOUT
+      DEFER_TASK_TIMEOUT
     );
   }
 
@@ -341,8 +346,11 @@ class MonetizationLoader {
     if (this.fetchPaymentInfoTask.isArmed) {
       this.fetchPaymentInfoTask.disarm();
       this.fetchPaymentInfo();
-    } else if (aDocument.visibilityState === "visible" && !this.currentPaymentInfo) {
-      console.log('onPageShow()');
+    } else if (
+      aDocument.visibilityState === "visible" &&
+      !this.currentPaymentInfo
+    ) {
+      console.log("onPageShow()");
       this.doUpdateMonetization(aDocument);
     }
   }
@@ -377,7 +385,11 @@ class MonetizationLoader {
   }
 
   startMonetization(aPaymentInfo) {
-    console.info("🤑 Start monetization", aPaymentInfo.pageUri.spec, aPaymentInfo.paymentPointerUri.spec);
+    console.info(
+      "🤑 Start monetization",
+      aPaymentInfo.pageUri.spec,
+      aPaymentInfo.paymentPointerUri.spec
+    );
     this.currentPaymentInfo = aPaymentInfo;
     this.fetchPaymentInfo();
   }
@@ -413,11 +425,11 @@ class MonetizationLoader {
 }
 
 /**
-* Gets the payment pointer URL and other details from the first valid
-* `link[rel=monetization]` in the document.
-*
-* @param {Document} aDocument
-*/
+ * Gets the payment pointer URL and other details from the first valid
+ * `link[rel=monetization]` in the document.
+ *
+ * @param {Document} aDocument
+ */
 function getPaymentInfo(aDocument) {
   if (!aDocument) {
     console.trace("no aDocument");
@@ -465,5 +477,10 @@ function getLinkURI(aLink) {
 }
 
 function isSame(aInfoA, aInfoB) {
-  return aInfoA && aInfoB && aInfoB.paymentPointerUri.equals(aInfoA.paymentPointerUri) && aInfoB.node === aInfoA.node;
+  return (
+    aInfoA &&
+    aInfoB &&
+    aInfoB.paymentPointerUri.equals(aInfoA.paymentPointerUri) &&
+    aInfoB.node === aInfoA.node
+  );
 }
