@@ -266,38 +266,26 @@ class Monetization {
    * @param {ReturnType<typeof makePaymentInfoFromLink>} paymentPointerInfo
    */
   async start(paymentPointerInfo) {
-    console.info("🔵 Start Monetization", paymentPointerInfo.pageUri.spec);
-    console.log('Fetch', paymentPointerInfo.paymentPointerUri.spec);
     if (this._fetcher) {
       this._fetcher.cancel();
     }
 
-    // // Let the main process that a tab icon is possibly coming.
-    // this.actor.sendAsyncMessage("Link:LoadingIcon", {
-    //   originalURL: paymentPointerInfo.paymentPointerUri.spec,
-    //   canUseForTab: !paymentPointerInfo.isRichIcon,
-    // });
-
     try {
       this._fetcher = new MonetizationFetcher(paymentPointerInfo);
       let response = await this._fetcher.fetch();
-      console.log(response);
-
-      // this.actor.sendAsyncMessage("Link:SetIcon", {
-      //   pageURL: paymentPointerInfo.pageUri.spec,
-      //   originalURL: paymentPointerInfo.paymentPointerUri.spec,
-      //   expiration,
-      //   paymentPointerURL: dataURL,
-      // });
+      this.actor.sendAsyncMessage("Link:SetMonetization", {
+        pageURL: paymentPointerInfo.pageUri.spec,
+        originalURL: paymentPointerInfo.paymentPointerUri.spec,
+        paymentInfo: response,
+      });
     } catch (e) {
-      // if (e.result != Cr.NS_BINDING_ABORTED) {
-      //   Cu.reportError(e);
-
-      //   // Used mainly for tests currently.
-      //   this.actor.sendAsyncMessage("Link:SetFailedIcon", {
-      //     originalURL: paymentPointerInfo.paymentPointerUri.spec,
-      //   });
-      // }
+      if (e.result != Cr.NS_BINDING_ABORTED) {
+        Cu.reportError(e);
+        this.actor.sendAsyncMessage("Link:SetFailedMonetization", {
+          pageURL: paymentPointerInfo.pageUri.spec,
+          originalURL: paymentPointerInfo.paymentPointerUri.spec,
+        });
+      }
     } finally {
       this._fetcher = null;
     }
@@ -305,7 +293,7 @@ class Monetization {
 
   stop() {
     this.cancel();
-    console.info("🔴 Stop monetization", this.actor.contentWindow.location.href);
+    this.actor.sendAsyncMessage("Link:UnsetMonetization", {});
   }
 
   cancel() {
