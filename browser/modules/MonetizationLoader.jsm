@@ -320,6 +320,82 @@ class MonetizationLoader {
     );
   }
 
+  onLinkEvent(aDocument) {
+    this.doUpdateMonetization(aDocument);
+  }
+
+  onVisbilityChange(aDocument) {
+    if (aDocument.visibilityState === "hidden") {
+      if (this.currentPaymentInfo /** && monetization is active */) {
+        this.stopMonetization(aDocument);
+      } else {
+        // Do nothing.
+      }
+    } else {
+      console.log("🤑 (Re)start monetization", aDocument.location.href);
+      this.doUpdateMonetization(aDocument);
+    }
+  }
+
+  onPageShow(aDocument) {
+    if (this.fetchPaymentInfoTask.isArmed) {
+      this.fetchPaymentInfoTask.disarm();
+      this.fetchPaymentInfo();
+    } else if (aDocument.visibilityState === "visible" && !this.currentPaymentInfo) {
+      console.log('onPageShow()');
+      this.doUpdateMonetization(aDocument);
+    }
+  }
+
+  // TODO: fix a leak here
+  onPageHide(aDocument) {
+    console.log("🤑☠ Stop monetization onPageHide()");
+    this.stopMonetization(aDocument);
+  }
+
+  // TODO: we should probably defer/throttle this
+  doUpdateMonetization(aDocument) {
+    this.document = aDocument;
+
+    const paymentInfo = getPaymentInfo(aDocument);
+    if (!paymentInfo) {
+      console.log("💔 no paymentInfo");
+      if (this.currentPaymentInfo) {
+        // all link tags have been removed, or the first such link tag is not valid anymore.
+        this.stopMonetization(aDocument);
+      } else {
+        // Nothing to do
+      }
+      return;
+    }
+
+    if (!this.currentPaymentInfo) {
+      this.startMonetization(paymentInfo);
+    } else if (!isSame(this.currentPaymentInfo, paymentInfo)) {
+      this.updateMonetization(paymentInfo, aDocument);
+    }
+  }
+
+  startMonetization(aPaymentInfo) {
+    console.info("🤑 Start monetization", aPaymentInfo.pageUri.spec, aPaymentInfo.paymentPointerUri.spec);
+    this.currentPaymentInfo = aPaymentInfo;
+    this.fetchPaymentInfo();
+  }
+
+  stopMonetization(aDocument) {
+    console.info("🤑 Stop monetization", aDocument?.location.href);
+    this.currentPaymentInfo = null;
+    this.document = null;
+    this.loader.stop();
+    this.fetchPaymentInfoTask.disarm();
+  }
+
+  updateMonetization(aPaymentInfo, aDocument) {
+    console.info("🤑 Update monetization", aDocument?.location.href);
+    this.stopMonetization(aDocument);
+    this.startMonetization(aPaymentInfo);
+  }
+
   fetchPaymentInfo() {
     // If the page is unloaded immediately after the DeferredTask's timer fires
     // we can still attempt to fetch from payment pointers URLs, which will fail
@@ -329,67 +405,31 @@ class MonetizationLoader {
       return;
     }
 
-    let paymentInfo = this.getPaymentInfo(this.document);
-    this.document = null;
-    if (this.setPaymentInfo(paymentInfo)) {
-      this.loader.start(paymentInfo);
+    if (this.currentPaymentInfo) {
+      this.document = null;
+      this.loader.start(this.currentPaymentInfo);
     }
-  }
-
-  tryUpdatePaymentInfo(aDocument) {
-    this.document = aDocument;
-    if (this.getPaymentInfo(aDocument)) {
-      this.fetchPaymentInfoTask.arm();
-      return true;
-    } else if (this.currentPaymentInfo) {
-      this.setPaymentInfo(null);
-    }
-    return false;
-  }
-
-  setPaymentInfo(aInfo) {
-    if (isSame(this.currentPaymentInfo, aInfo)) {
-      return false;
-    } else {
-      this.currentPaymentInfo = aInfo;
-      if (!aInfo) {
-        this.loader.stop();
-      }
-      return true;
-    }
-  }
-
-  /**
-   * Gets the payment pointer URL and other details from the first valid
-   * `link[rel=monetization]` in the document.
-   *
-   * @param {Document} aDocument
-   */
-  getPaymentInfo() {
-    const link = this.document.head.querySelector("link[rel~=monetization][href]");
-    if (!link) {
-      return null;
-    }
-    const paymentInfo = makePaymentInfoFromLink(link);
-    return paymentInfo;
-  }
-
-  onPageShow() {
-    if (this.fetchPaymentInfoTask.isArmed) {
-      this.fetchPaymentInfoTask.disarm();
-      this.fetchPaymentInfo();
-    }
-  }
-
-  // TODO: fix a leak here
-  onPageHide() {
-    this.loader.cancel();
-    this.fetchPaymentInfoTask.disarm();
-    this.document = null;
-    this.setPaymentInfo(null);
   }
 }
 
+/**
+* Gets the payment pointer URL and other details from the first valid
+* `link[rel=monetization]` in the document.
+*
+* @param {Document} aDocument
+*/
+function getPaymentInfo(aDocument) {
+  if (!aDocument) {
+    console.trace("no aDocument");
+    return null;
+  }
+  const link = aDocument.head.querySelector("link[rel~=monetization][href]");
+  if (!link) {
+    return null;
+  }
+  const paymentInfo = makePaymentInfoFromLink(link);
+  return paymentInfo;
+}
 
 function makePaymentInfoFromLink(aLink) {
   let paymentPointerUri = getLinkURI(aLink);

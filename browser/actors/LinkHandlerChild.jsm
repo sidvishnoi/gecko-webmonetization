@@ -72,9 +72,7 @@ class LinkHandlerChild extends JSWindowActorChild {
     if (this._iconLoader) {
       this._iconLoader.onPageShow();
     }
-    if (this._monetizationLoader) {
-      this._monetizationLoader.onPageShow();
-    }
+    this._monetizationLoader?.onPageShow(this.document);
   }
 
   onPageShow(event) {
@@ -87,9 +85,8 @@ class LinkHandlerChild extends JSWindowActorChild {
     if (this._iconLoader) {
       this._iconLoader.onPageShow();
     }
-    if (this._monetizationLoader) {
-      this._monetizationLoader.onPageShow();
-    }
+
+    this._monetizationLoader?.onPageShow(this.document);
   }
 
   onPageHide(event) {
@@ -100,11 +97,28 @@ class LinkHandlerChild extends JSWindowActorChild {
     if (this._iconLoader) {
       this._iconLoader.onPageHide();
     }
-    if (this._monetizationLoader) {
-      this._monetizationLoader.onPageHide();
+    this.seenTabIcon = false;
+
+    this._monetizationLoader?.onPageHide(this.document);
+  }
+
+  onVisibilityChange(event) {
+    if (event.target != this.document) {
+      console.log('Is this even possible?');
+      return;
+    }
+    if (this.document.ownerGlobal != this.contentWindow) {
+      console.log('Is this even more possible?');
+      return;
     }
 
-    this.seenTabIcon = false;
+    // TODO: there must be a better way t
+    const url = this.document.location;
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      return;
+    }
+
+    this.monetizationLoader.onVisbilityChange(this.document);
   }
 
   onLinkEvent(event) {
@@ -184,7 +198,7 @@ class LinkHandlerChild extends JSWindowActorChild {
           }
           break;
         case "monetization":
-          this.monetizationLoader.tryUpdatePaymentInfo(link.ownerDocument);
+          this.monetizationLoader.onLinkEvent(link.ownerDocument);
           break;
       }
     }
@@ -196,6 +210,8 @@ class LinkHandlerChild extends JSWindowActorChild {
         return this.onPageShow(event);
       case "pagehide":
         return this.onPageHide(event);
+      case "visibilitychange":
+        return this.onVisibilityChange(event);
       case "DOMHeadElementParsed":
         return this.onHeadParsed(event);
       default:

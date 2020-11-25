@@ -525,6 +525,7 @@ let JSWINDOWACTORS = {
         DOMLinkRemoved: {},
         pageshow: {},
         pagehide: {},
+        visibilitychange: {},
       },
     },
   },
