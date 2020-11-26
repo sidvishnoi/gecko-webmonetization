@@ -60,27 +60,18 @@ class MonetizationFetcher {
   constructor(paymentPointerInfo) {
     this.paymentPointerInfo = paymentPointerInfo;
 
-    // TODO: hard-code based on spec
-    let securityFlags;
-    if (paymentPointerInfo.node.crossOrigin === "anonymous") {
-      securityFlags = Ci.nsILoadInfo.SEC_REQUIRE_CORS_INHERITS_SEC_CONTEXT;
-    } else if (paymentPointerInfo.node.crossOrigin === "use-credentials") {
-      securityFlags =
-        Ci.nsILoadInfo.SEC_REQUIRE_CORS_INHERITS_SEC_CONTEXT |
-        Ci.nsILoadInfo.SEC_COOKIES_INCLUDE;
-    } else {
-      securityFlags =
-        Ci.nsILoadInfo.SEC_ALLOW_CROSS_ORIGIN_INHERITS_SEC_CONTEXT;
-    }
+    // TODO: Check if security should/can be made stricter. Is there no
+    // nsILoadInfo for JSON?
+    const securityFlags =
+      Ci.nsILoadInfo.SEC_REQUIRE_CORS_INHERITS_SEC_CONTEXT |
+      Ci.nsILoadInfo.SEC_DISALLOW_SCRIPT;
 
     this.channel = Services.io.newChannelFromURI(
       paymentPointerInfo.paymentPointerUri,
       paymentPointerInfo.node,
       paymentPointerInfo.node.nodePrincipal,
       paymentPointerInfo.node.nodePrincipal,
-      // TODO: Check if security should/can be made stricter. Is there no
-      // nsILoadInfo for JSON?
-      securityFlags | Ci.nsILoadInfo.SEC_DISALLOW_SCRIPT,
+      securityFlags,
       // TODO: provide proper nsIContentPolicy
       Ci.nsIContentPolicy.TYPE_OTHER
     );
