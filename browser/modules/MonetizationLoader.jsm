@@ -355,9 +355,9 @@ class MonetizationLoader {
     }
   }
 
-  // TODO: fix a leak here
   onPageHide(aDocument) {
     console.log("🤑☠ Stop monetization onPageHide()");
+    this.document = null;
     this.stopMonetization(aDocument);
   }
 
@@ -397,7 +397,6 @@ class MonetizationLoader {
   stopMonetization(aDocument) {
     console.info("🤑 Stop monetization", aDocument?.location.href);
     this.currentPaymentInfo = null;
-    this.document = null;
     this.loader.stop();
     this.fetchPaymentInfoTask.disarm();
   }
