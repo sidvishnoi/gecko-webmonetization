@@ -103,12 +103,11 @@ class LinkHandlerChild extends JSWindowActorChild {
   }
 
   onVisibilityChange(event) {
-    if (event.target != this.document) {
-      console.log("Is this even possible?");
-      return;
-    }
-    if (this.document.ownerGlobal != this.contentWindow) {
-      console.log("Is this even more possible?");
+    if (
+      event.target != this.document ||
+      this.document.ownerGlobal != this.contentWindow
+    ) {
+      // Verify if these cases are even possible.
       return;
     }
 
