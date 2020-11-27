@@ -314,7 +314,9 @@ class MonetizationLoader {
   }
 
   onLinkEvent(aDocument) {
-    this.doUpdateMonetization(aDocument);
+    if (aDocument.visibilityState === "visible") {
+      this.doUpdateMonetization(aDocument);
+    }
   }
 
   onVisbilityChange(aDocument) {
