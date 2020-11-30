@@ -72,8 +72,7 @@ class MonetizationFetcher {
       paymentPointerInfo.node.nodePrincipal,
       paymentPointerInfo.node.nodePrincipal,
       securityFlags,
-      // TODO: provide proper nsIContentPolicy
-      Ci.nsIContentPolicy.TYPE_OTHER
+      Ci.nsIContentPolicy.TYPE_MONETIZATION
     );
 
     if (this.channel instanceof Ci.nsIHttpChannel) {

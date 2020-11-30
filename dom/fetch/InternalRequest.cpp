@@ -269,6 +269,8 @@ RequestDestination InternalRequest::MapContentPolicyTypeToRequestDestination(
       return RequestDestination::_empty;
     case nsIContentPolicy::TYPE_WEB_MANIFEST:
       return RequestDestination::Manifest;
+    case nsIContentPolicy::TYPE_MONETIZATION:
+      return RequestDestination::Monetization;
     case nsIContentPolicy::TYPE_SAVEAS_DOWNLOAD:
       return RequestDestination::_empty;
     case nsIContentPolicy::TYPE_SPECULATIVE:

@@ -56,12 +56,13 @@ interface nsIContentSecurityPolicy : nsISerializable
     BASE_URI_DIRECTIVE             = 13,
     FORM_ACTION_DIRECTIVE          = 14,
     WEB_MANIFEST_SRC_DIRECTIVE     = 15,
-    UPGRADE_IF_INSECURE_DIRECTIVE  = 16,
-    CHILD_SRC_DIRECTIVE            = 17,
-    BLOCK_ALL_MIXED_CONTENT        = 18,
-    SANDBOX_DIRECTIVE              = 19,
-    WORKER_SRC_DIRECTIVE           = 20,
-    NAVIGATE_TO_DIRECTIVE          = 21,
+    MONETIZATION_SRC_DIRECTIVE     = 16,
+    UPGRADE_IF_INSECURE_DIRECTIVE  = 17,
+    CHILD_SRC_DIRECTIVE            = 18,
+    BLOCK_ALL_MIXED_CONTENT        = 19,
+    SANDBOX_DIRECTIVE              = 20,
+    WORKER_SRC_DIRECTIVE           = 21,
+    NAVIGATE_TO_DIRECTIVE          = 22,
   };
 
   /**
@@ -151,15 +152,15 @@ interface nsIContentSecurityPolicy : nsISerializable
    * policy.
    * @param aURI The target URI
    * @param aIsFormSubmission True if the navigation was initiated by a form submission. This
-   *        is important since the form-action directive overrides navigate-to in that case.  
+   *        is important since the form-action directive overrides navigate-to in that case.
    * @param aWasRedirect True if a redirect has happened. Important for path-sensitivity.
-   * @param aEnforceWhitelist True if the whitelist of allowed targets must be enforced. If 
-   *        this is true, the whitelist must be enforced even if 'unsafe-allow-redirects' is 
+   * @param aEnforceWhitelist True if the whitelist of allowed targets must be enforced. If
+   *        this is true, the whitelist must be enforced even if 'unsafe-allow-redirects' is
    *        used. If 'unsafe-allow-redirects' is not used then the whitelist is always enforced
    * @return
    *     Whether or not the effects of the navigation is allowed
    */
-  boolean getAllowsNavigateTo(in nsIURI aURI, 
+  boolean getAllowsNavigateTo(in nsIURI aURI,
                               in boolean aIsFormSubmission,
                               in boolean aWasRedirected,
                               in boolean aEnforceWhitelist);

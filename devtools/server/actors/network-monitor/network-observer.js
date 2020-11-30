@@ -1676,6 +1676,7 @@ const LOAD_CAUSE_STRINGS = {
   [Ci.nsIContentPolicy.TYPE_FETCH]: "fetch",
   [Ci.nsIContentPolicy.TYPE_IMAGESET]: "imageset",
   [Ci.nsIContentPolicy.TYPE_WEB_MANIFEST]: "webManifest",
+  [Ci.nsIContentPolicy.TYPE_MONETIZATION]: "monetization",
 };
 
 function causeTypeToString(causeType, loadFlags, internalContentPolicyType) {

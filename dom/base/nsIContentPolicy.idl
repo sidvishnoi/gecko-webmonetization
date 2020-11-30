@@ -422,6 +422,11 @@ interface nsIContentPolicy : nsISupports
      */
     TYPE_INTERNAL_FETCH_PRELOAD = 54,
 
+    /**
+     * Indicates a <link rel=monetization>.
+     */
+    TYPE_MONETIZATION = 55,
+
     /* When adding new content types, please update
      * NS_CP_ContentTypeName, nsCSPContext, CSP_ContentTypeToDirective,
      * DoContentSecurityChecks, all nsIContentPolicy implementations, the
