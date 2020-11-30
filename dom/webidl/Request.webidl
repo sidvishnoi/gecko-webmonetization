@@ -69,7 +69,7 @@ dictionary RequestInit {
 
 enum RequestDestination {
   "",
-  "audio", "audioworklet", "document", "embed", "font", "image", "manifest", "object",
+  "audio", "audioworklet", "document", "embed", "font", "image", "manifest", "monetization", "object",
   "paintworklet", "report", "script", "sharedworker", "style",  "track", "video",
   "worker", "xslt"
 };

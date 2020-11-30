@@ -210,6 +210,10 @@ void nsHTTPSOnlyStreamListener::RecordUpgradeTelemetry(nsIRequest* request,
         typeKey = "webmanifest"_ns;
         break;
 
+      case nsIContentPolicy::TYPE_MONETIZATION:
+        typeKey = "monetization"_ns;
+        break;
+
       case nsIContentPolicy::TYPE_PING:
         typeKey = "ping"_ns;
         break;

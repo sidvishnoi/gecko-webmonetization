@@ -287,6 +287,9 @@ CSPDirective CSP_ContentTypeToDirective(nsContentPolicyType aType) {
     case nsIContentPolicy::TYPE_WEB_MANIFEST:
       return nsIContentSecurityPolicy::WEB_MANIFEST_SRC_DIRECTIVE;
 
+    case nsIContentPolicy::TYPE_MONETIZATION:
+      return nsIContentSecurityPolicy::MONETIZATION_SRC_DIRECTIVE;
+
     case nsIContentPolicy::TYPE_INTERNAL_WORKER:
     case nsIContentPolicy::TYPE_INTERNAL_SHARED_WORKER:
     case nsIContentPolicy::TYPE_INTERNAL_SERVICE_WORKER:
@@ -1170,6 +1173,11 @@ void nsCSPDirective::toDomCSPStruct(mozilla::dom::CSP& outCSP) const {
       outCSP.mManifest_src.Value() = std::move(srcs);
       return;
       // not supporting REFLECTED_XSS_DIRECTIVE
+
+    case nsIContentSecurityPolicy::MONETIZATION_SRC_DIRECTIVE:
+      outCSP.mMonetization_src.Construct();
+      outCSP.mMonetization_src.Value() = std::move(srcs);
+      return;
 
     case nsIContentSecurityPolicy::BASE_URI_DIRECTIVE:
       outCSP.mBase_uri.Construct();

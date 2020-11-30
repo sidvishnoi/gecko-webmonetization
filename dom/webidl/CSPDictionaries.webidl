@@ -25,6 +25,7 @@ dictionary CSP {
   sequence<DOMString> form-action;
   sequence<DOMString> referrer;
   sequence<DOMString> manifest-src;
+  sequence<DOMString> monetization-src;
   sequence<DOMString> upgrade-insecure-requests;
   sequence<DOMString> child-src;
   sequence<DOMString> block-all-mixed-content;
