@@ -82,6 +82,7 @@ static const char* CSPStrDirectives[] = {
     "base-uri",                   // BASE_URI_DIRECTIVE
     "form-action",                // FORM_ACTION_DIRECTIVE
     "manifest-src",               // MANIFEST_SRC_DIRECTIVE
+    "monetization-src",           // MONETIZATION_SRC_DIRECTIVE
     "upgrade-insecure-requests",  // UPGRADE_IF_INSECURE_DIRECTIVE
     "child-src",                  // CHILD_SRC_DIRECTIVE
     "block-all-mixed-content",    // BLOCK_ALL_MIXED_CONTENT

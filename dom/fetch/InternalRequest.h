@@ -47,6 +47,7 @@ namespace dom {
  * "image"           | TYPE_INTERNAL_IMAGE, TYPE_INTERNAL_IMAGE_PRELOAD,
  *                   | TYPE_IMAGE, TYPE_INTERNAL_IMAGE_FAVICON, TYPE_IMAGESET
  * "manifest"        | TYPE_WEB_MANIFEST
+ * "monetization"    | TYPE_MONETIZATION
  * "object"          | TYPE_INTERNAL_OBJECT, TYPE_OBJECT
  * "paintworklet"    | TYPE_INTERNAL_PAINTWORKLET
  * "report"          | TYPE_CSP_REPORT

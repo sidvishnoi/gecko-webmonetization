@@ -99,6 +99,8 @@ nsCString MapInternalContentPolicyTypeToDest(nsContentPolicyType aType) {
       return "empty"_ns;
     case nsIContentPolicy::TYPE_WEB_MANIFEST:
       return "manifest"_ns;
+    case nsIContentPolicy::TYPE_MONETIZATION:
+      return "monetization"_ns;
     case nsIContentPolicy::TYPE_SAVEAS_DOWNLOAD:
       return "empty"_ns;
     case nsIContentPolicy::TYPE_SPECULATIVE:

@@ -57,12 +57,13 @@ interface nsIContentSecurityPolicy : nsISerializable
   const unsigned short BASE_URI_DIRECTIVE             = 13;
   const unsigned short FORM_ACTION_DIRECTIVE          = 14;
   const unsigned short WEB_MANIFEST_SRC_DIRECTIVE     = 15;
-  const unsigned short UPGRADE_IF_INSECURE_DIRECTIVE  = 16;
-  const unsigned short CHILD_SRC_DIRECTIVE            = 17;
-  const unsigned short BLOCK_ALL_MIXED_CONTENT        = 18;
-  const unsigned short SANDBOX_DIRECTIVE              = 19;
-  const unsigned short WORKER_SRC_DIRECTIVE           = 20;
-  const unsigned short NAVIGATE_TO_DIRECTIVE          = 21;
+  const unsigned short MONETIZATION_SRC_DIRECTIVE     = 16;
+  const unsigned short UPGRADE_IF_INSECURE_DIRECTIVE  = 17;
+  const unsigned short CHILD_SRC_DIRECTIVE            = 18;
+  const unsigned short BLOCK_ALL_MIXED_CONTENT        = 19;
+  const unsigned short SANDBOX_DIRECTIVE              = 20;
+  const unsigned short WORKER_SRC_DIRECTIVE           = 21;
+  const unsigned short NAVIGATE_TO_DIRECTIVE          = 22;
 
   /**
    * Accessor method for a read-only string version of the policy at a given

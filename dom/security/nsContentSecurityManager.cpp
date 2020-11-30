@@ -570,6 +570,11 @@ static nsresult DoContentSecurityChecks(nsIChannel* aChannel,
       break;
     }
 
+    case nsIContentPolicy::TYPE_MONETIZATION: {
+      mimeTypeGuess = "application/spsp4+json"_ns;
+      break;
+    }
+
     case nsIContentPolicy::TYPE_SAVEAS_DOWNLOAD: {
       mimeTypeGuess.Truncate();
       break;

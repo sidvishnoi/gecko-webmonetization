@@ -628,7 +628,7 @@ template <>
 struct ParamTraits<nsContentPolicyType>
     : public ContiguousEnumSerializerInclusive<
           nsContentPolicyType, nsIContentPolicy::TYPE_INVALID,
-          nsIContentPolicy::TYPE_INTERNAL_FETCH_PRELOAD> {};
+          nsIContentPolicy::TYPE_MONETIZATION> {};
 
 template <>
 struct ParamTraits<mozilla::TimeDuration> {
