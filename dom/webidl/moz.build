@@ -713,6 +713,7 @@ WEBIDL_FILES = [
     "MIDIPort.webidl",
     "MimeType.webidl",
     "MimeTypeArray.webidl",
+    "MonetizationPayment.webidl",
     "MouseEvent.webidl",
     "MouseScrollEvent.webidl",
     "MozFrameLoaderOwner.webidl",

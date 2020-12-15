@@ -29,6 +29,7 @@ UNIFIED_SOURCES += [
     "PaymentActionResponse.cpp",
     "PaymentAddress.cpp",
     "PaymentMethodChangeEvent.cpp",
+    "PaymentMethodWebMonetization.cpp",
     "PaymentRequest.cpp",
     "PaymentRequestData.cpp",
     "PaymentRequestManager.cpp",

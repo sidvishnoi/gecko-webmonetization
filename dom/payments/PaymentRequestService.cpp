@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "BasicCardPayment.h"
+#include "PaymentMethodWebMonetization.h"
 #include "mozilla/ClearOnShutdown.h"
 #include "mozilla/dom/BasicCardPaymentBinding.h"
 #include "mozilla/dom/PaymentRequestParent.h"
@@ -534,7 +535,7 @@ bool PaymentRequestService::CanMakePayment(const nsAString& aRequestId) {
    *  TODO: Check third party payment app support by traversing all
    *        registered third party payment apps.
    */
-  return IsBasicCardPayment(aRequestId);
+  return IsBasicCardPayment(aRequestId) || IsWebMonetizationPayment(aRequestId);
 }
 
 nsresult PaymentRequestService::ShowPayment(const nsAString& aRequestId,
@@ -599,6 +600,37 @@ bool PaymentRequestService::IsBasicCardPayment(const nsAString& aRequestId) {
     if (service->IsBasicCardPayment(supportedMethods)) {
       return true;
     }
+  }
+  return false;
+}
+
+bool PaymentRequestService::IsWebMonetizationPayment(
+    const nsAString& aRequestId) {
+  RefPtr<payments::PaymentRequest> request;
+  nsresult rv = GetPaymentRequestById(aRequestId, getter_AddRefs(request));
+  NS_ENSURE_SUCCESS(rv, false);
+  nsCOMPtr<nsIArray> methods;
+  rv = request->GetPaymentMethods(getter_AddRefs(methods));
+  NS_ENSURE_SUCCESS(rv, false);
+
+  uint32_t numMethods;
+  rv = methods->GetLength(&numMethods);
+  NS_ENSURE_SUCCESS(rv, false);
+  // With "monetization", we do not support any alternate payment methods.
+  if (numMethods != 1) {
+    return false;
+  }
+
+  RefPtr<WebMonetizationPaymentService> service =
+      WebMonetizationPaymentService::GetService();
+  MOZ_ASSERT(service);
+  nsCOMPtr<nsIPaymentMethodData> method = do_QueryElementAt(methods, 0);
+  MOZ_ASSERT(method);
+  nsAutoString supportedMethods;
+  rv = method->GetSupportedMethods(supportedMethods);
+  NS_ENSURE_SUCCESS(rv, false);
+  if (service->IsWebMonetizationPayment(supportedMethods)) {
+    return true;
   }
   return false;
 }

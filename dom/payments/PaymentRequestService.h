@@ -49,6 +49,7 @@ class PaymentRequestService final : public nsIPaymentRequestService {
   nsresult ShowPayment(const nsAString& aRequestId, bool aIsUpdating);
 
   bool IsBasicCardPayment(const nsAString& aRequestId);
+  bool IsWebMonetizationPayment(const nsAString& aRequestId);
 
   FallibleTArray<RefPtr<payments::PaymentRequest>> mRequestQueue;
 

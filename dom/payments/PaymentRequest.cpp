@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "BasicCardPayment.h"
+#include "PaymentMethodWebMonetization.h"
 #include "mozilla/dom/Document.h"
 #include "mozilla/dom/Element.h"
 #include "mozilla/dom/FeaturePolicyUtils.h"
@@ -337,6 +338,24 @@ void PaymentRequest::IsValidMethodData(
         return;
       }
     }
+
+    RefPtr<WebMonetizationPaymentService> webMonetizationService =
+        WebMonetizationPaymentService::GetService();
+    MOZ_ASSERT(service);
+    if (webMonetizationService->IsWebMonetizationPayment(
+            methodData.mSupportedMethods)) {
+      if (!methodData.mData.WasPassed()) {
+        continue;
+      }
+      MOZ_ASSERT(aCx);
+      nsAutoString error;
+      if (!webMonetizationService->IsValidWebMonetizationPaymentRequest(
+              aCx, methodData.mData.Value(), error)) {
+        aRv.ThrowTypeError(NS_ConvertUTF16toUTF8(error));
+        return;
+      }
+    }
+
     if (!methods.Contains(methodData.mSupportedMethods)) {
       methods.AppendElement(methodData.mSupportedMethods);
     } else {

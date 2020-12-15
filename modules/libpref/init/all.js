@@ -4394,6 +4394,7 @@ pref("dom.payments.loglevel", "Warn");
 pref("dom.payments.defaults.saveCreditCard", false);
 pref("dom.payments.defaults.saveAddress", true);
 pref("dom.payments.request.supportedRegions", "US,CA");
+pref("dom.payments.request.monetization.provider", "https://example.com");
 
 #ifdef MOZ_ASAN_REPORTER
   pref("asanreporter.apiurl", "https://anf1.fuzzing.mozilla.org/crashproxy/submit/");
