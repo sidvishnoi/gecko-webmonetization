@@ -2302,13 +2302,13 @@
 # Enable/disable the PaymentRequest API
 - name: dom.payments.request.enabled
   type: bool
-  value: false
+  value: true
   mirror: always
 
 # Whether a user gesture is required to call PaymentRequest.prototype.show().
 - name: dom.payments.request.user_interaction_required
   type: bool
-  value: true
+  value: false
   mirror: always
 
 # Time in milliseconds for PaymentResponse to wait for
