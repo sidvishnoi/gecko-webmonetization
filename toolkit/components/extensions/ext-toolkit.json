@@ -116,6 +116,15 @@
       ["management"]
     ]
   },
+  "monetization": {
+    "url": "chrome://extensions/content/parent/ext-monetization.js",
+    "schema": "chrome://extensions/content/schemas/monetization.json",
+    "scopes": ["addon_parent"],
+    "permissions": ["monetization"],
+    "paths": [
+      ["monetization"]
+    ]
+  },
   "networkStatus": {
     "url": "chrome://extensions/content/parent/ext-networkStatus.js",
     "schema": "chrome://extensions/content/schemas/network_status.json",
