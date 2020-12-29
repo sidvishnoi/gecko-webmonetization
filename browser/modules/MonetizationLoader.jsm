@@ -252,12 +252,17 @@ class MonetizationFetcher {
 class Monetization {
   constructor(actor) {
     this.actor = actor;
+    // Avoid race condition when a start was initiated and a stop/pause is
+    // requested (the user navigates away from the page or some reason). We do
+    // not emit a start event in such cases.
+    this.state = null;
   }
 
   /**
    * @param {ReturnType<typeof makePaymentInfoFromLink>} paymentPointerInfo
    */
   async start(paymentPointerInfo) {
+    this.state = "starting";
     if (this._fetcher) {
       this._fetcher.cancel();
     }
@@ -265,6 +270,9 @@ class Monetization {
     try {
       this._fetcher = new MonetizationFetcher(paymentPointerInfo);
       let response = await this._fetcher.fetch();
+      if (this.state !== "starting") {
+        return;
+      }
       this.actor.sendAsyncMessage("Link:SetMonetization", {
         pageURL: paymentPointerInfo.pageUri.spec,
         originalURL: paymentPointerInfo.paymentPointerUri.spec,
@@ -279,11 +287,13 @@ class Monetization {
         });
       }
     } finally {
+      this.state = null;
       this._fetcher = null;
     }
   }
 
   stop() {
+    this.state = "stopped";
     this.cancel();
     this.actor.sendAsyncMessage("Link:UnsetMonetization", {});
   }
