@@ -1,0 +1,91 @@
+[
+  {
+    "namespace": "manifest",
+    "types": [
+      {
+        "$extend": "Permission",
+        "choices": [{
+          "type": "string",
+          "enum": ["monetization"]
+        }]
+      }
+    ]
+  },
+  {
+    "namespace": "monetization",
+    "permissions": ["monetization"],
+    "events": [
+      {
+        "name": "onStart",
+        "type": "function",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "type": "string"
+          },
+          {
+            "name": "spspResponse",
+            "type": "object",
+            "properties": {
+              "destination_account": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "onStop",
+        "type": "function",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "onPause",
+        "type": "function",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "onResume",
+        "type": "function",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "completePayment",
+        "type": "function",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "refresh",
+        "type": "function",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "type": "string"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -19,6 +19,16 @@ ChromeUtils.defineModuleGetter(
   "resource://gre/modules/PromiseUtils.jsm"
 );
 
+const { XPCOMUtils } = ChromeUtils.import(
+  "resource://gre/modules/XPCOMUtils.jsm"
+);
+XPCOMUtils.defineLazyServiceGetter(
+  this,
+  "gUUIDGenerator",
+  "@mozilla.org/uuid-generator;1",
+  "nsIUUIDGenerator"
+);
+
 const StorageStream = Components.Constructor(
   "@mozilla.org/storagestream;1",
   "nsIStorageStream",
@@ -261,7 +271,7 @@ class Monetization {
   /**
    * @param {ReturnType<typeof makePaymentInfoFromLink>} paymentPointerInfo
    */
-  async start(paymentPointerInfo) {
+  async start(sessionId, paymentPointerInfo) {
     this.state = "starting";
     if (this._fetcher) {
       this._fetcher.cancel();
@@ -274,9 +284,10 @@ class Monetization {
         return;
       }
       this.actor.sendAsyncMessage("Link:SetMonetization", {
+        sessionId,
         pageURL: paymentPointerInfo.pageUri.spec,
         originalURL: paymentPointerInfo.paymentPointerUri.spec,
-        paymentInfo: response,
+        spspResponse: response,
       });
     } catch (e) {
       if (e.result != Cr.NS_BINDING_ABORTED) {
@@ -292,10 +303,20 @@ class Monetization {
     }
   }
 
-  stop() {
+  stop(sessionId) {
     this.state = "stopped";
     this.cancel();
-    this.actor.sendAsyncMessage("Link:UnsetMonetization", {});
+    this.actor.sendAsyncMessage("Link:UnsetMonetization", { sessionId });
+  }
+
+  pause(sessionId) {
+    this.state = "paused";
+    this.actor.sendAsyncMessage("Link:PauseMonetization", { sessionId });
+  }
+
+  resume(sessionId) {
+    this.state = null;
+    this.actor.sendAsyncMessage("Link:ResumeMonetization", { sessionId });
   }
 
   cancel() {
@@ -313,6 +334,7 @@ class MonetizationLoader {
     this.actor = actor;
     this.document = null;
     this.currentPaymentInfo = null;
+    this.sessionId = null;
 
     this.loader = new Monetization(actor);
 
@@ -331,13 +353,13 @@ class MonetizationLoader {
   onVisbilityChange(aDocument) {
     if (aDocument.visibilityState === "hidden") {
       if (this.currentPaymentInfo /** && monetization is active */) {
-        this.stopMonetization(aDocument);
+        this.pauseMonetization();
       } else {
         // Do nothing.
       }
     } else {
       console.log("🤑 (Re)start monetization", aDocument.location.href);
-      this.doUpdateMonetization(aDocument);
+      this.resumeMonetization();
     }
   }
 
@@ -389,15 +411,28 @@ class MonetizationLoader {
       aPaymentInfo.pageUri.spec,
       aPaymentInfo.paymentPointerUri.spec
     );
+    this.sessionId = generateSessionId();
     this.currentPaymentInfo = aPaymentInfo;
     this.fetchPaymentInfo();
   }
 
   stopMonetization(aDocument) {
     console.info("🤑 Stop monetization", aDocument?.location.href);
+    const sessionId = this.sessionId;
+    this.sessionId = null;
     this.currentPaymentInfo = null;
-    this.loader.stop();
+    this.loader.stop(sessionId);
     this.fetchPaymentInfoTask.disarm();
+  }
+
+  pauseMonetization() {
+    console.log("🤑 Pause", this.document?.location?.href);
+    this.loader.pause(this.sessionId);
+  }
+
+  resumeMonetization() {
+    console.log("🤑 Resume", this.document?.location?.href);
+    this.loader.resume(this.sessionId);
   }
 
   updateMonetization(aPaymentInfo, aDocument) {
@@ -415,9 +450,9 @@ class MonetizationLoader {
       return;
     }
 
-    if (this.currentPaymentInfo) {
+    if (this.currentPaymentInfo && this.sessionId) {
       this.document = null;
-      this.loader.start(this.currentPaymentInfo);
+      this.loader.start(this.sessionId, this.currentPaymentInfo);
     }
   }
 }
@@ -481,4 +516,11 @@ function isSame(aInfoA, aInfoB) {
     aInfoB.paymentPointerUri.equals(aInfoA.paymentPointerUri) &&
     aInfoB.node === aInfoA.node
   );
+}
+
+function generateSessionId() {
+  return gUUIDGenerator
+    .generateUUID()
+    .toString()
+    .slice(1, -1); // Discard surrounding braces
 }

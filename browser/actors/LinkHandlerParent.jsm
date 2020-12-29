@@ -16,6 +16,44 @@ ChromeUtils.defineModuleGetter(
 
 let gTestListeners = new Set();
 
+const monetization = new (class MonetizationService {
+  constructor() {
+    /** @type {Map<string, { state: "active" | "paused" }>} sessionId => info */
+    this.activeSessions = new Map();
+  }
+
+  start({ sessionId, spspResponse }) {
+    this.activeSessions.set(sessionId, { state: "active" });
+    const data = { sessionId, spspResponse };
+    Services.obs.notifyObservers(
+      null,
+      "monetization:start",
+      JSON.stringify(data)
+    );
+  }
+
+  stop({ sessionId }) {
+    if (this.activeSessions.has(sessionId)) {
+      this.activeSessions.delete(sessionId);
+      Services.obs.notifyObservers(null, "monetization:stop", sessionId);
+    }
+  }
+
+  pause({ sessionId }) {
+    if (this.activeSessions.get(sessionId)?.state === "active") {
+      this.activeSessions.get(sessionId).state = "paused";
+      Services.obs.notifyObservers(null, "monetization:pause", sessionId);
+    }
+  }
+
+  resume({ sessionId }) {
+    if (this.activeSessions.get(sessionId)?.state === "paused") {
+      this.activeSessions.get(sessionId).state = "active";
+      Services.obs.notifyObservers(null, "monetization:resume", sessionId);
+    }
+  }
+})();
+
 class LinkHandlerParent extends JSWindowActorParent {
   static addListenerForTests(listener) {
     gTestListeners.add(listener);
@@ -100,11 +138,23 @@ class LinkHandlerParent extends JSWindowActorParent {
         break;
 
       case "Link:SetMonetization":
-      case "Link:SetFailedMonetization":
-      case "Link:UnsetMonetization": {
-        console.info(aMsg.name, aMsg.data);
+        monetization.start(aMsg.data);
         break;
-      }
+
+      case "Link:SetFailedMonetization":
+        break;
+
+      case "Link:UnsetMonetization":
+        monetization.stop(aMsg.data);
+        break;
+
+      case "Link:PauseMonetization":
+        monetization.pause(aMsg.data);
+        break;
+
+      case "Link:ResumeMonetization":
+        monetization.resume(aMsg.data);
+        break;
     }
   }
 
