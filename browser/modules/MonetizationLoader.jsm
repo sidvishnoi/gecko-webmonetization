@@ -346,9 +346,11 @@ class MonetizationLoader {
       } else {
         // Do nothing.
       }
-    } else {
+    } else if (this.currentPaymentInfo) {
       console.log("🤑 (Re)start monetization", aDocument.location.href);
       this.resumeMonetization();
+    } else {
+      this.doUpdateMonetization(aDocument);
     }
   }
 
@@ -440,7 +442,6 @@ class MonetizationLoader {
     }
 
     if (this.currentPaymentInfo && this.sessionId) {
-      this.document = null;
       this.loader.start(this.sessionId, this.currentPaymentInfo);
     }
   }
