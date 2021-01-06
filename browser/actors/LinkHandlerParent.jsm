@@ -55,6 +55,33 @@ const monetization = new (class MonetizationService {
 })();
 
 class LinkHandlerParent extends JSWindowActorParent {
+  actorCreated() {
+    this._monetizationRefreshCallback = async (subject, topic, sessionId) => {
+      const res = await this.sendQuery(
+        "monetization:refresh:request",
+        sessionId
+      );
+      if (res && res.oldSessionId === sessionId) {
+        Services.obs.notifyObservers(
+          null,
+          "monetization:refresh:response",
+          JSON.stringify(res)
+        );
+      }
+    };
+    Services.obs.addObserver(
+      this._monetizationRefreshCallback,
+      "monetization:refresh"
+    );
+  }
+
+  didDestroy() {
+    Services.obs.removeObserver(
+      this._monetizationRefreshCallback,
+      "monetization:refresh"
+    );
+  }
+
   static addListenerForTests(listener) {
     gTestListeners.add(listener);
   }

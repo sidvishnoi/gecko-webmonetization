@@ -350,7 +350,7 @@ class MonetizationLoader {
       console.log("🤑 (Re)start monetization", aDocument.location.href);
       this.resumeMonetization();
     } else {
-      this.doUpdateMonetization(aDocument);
+      this.doUpdateMonetization(aDocument, true);
     }
   }
 
@@ -374,7 +374,7 @@ class MonetizationLoader {
   }
 
   // TODO: we should probably defer/throttle this
-  doUpdateMonetization(aDocument) {
+  doUpdateMonetization(aDocument, forceUpdate = false) {
     this.document = aDocument;
 
     const paymentInfo = getPaymentInfo(aDocument);
@@ -389,9 +389,9 @@ class MonetizationLoader {
       return;
     }
 
-    if (!this.currentPaymentInfo) {
+    if (!this.currentPaymentInfo && !forceUpdate) {
       this.startMonetization(paymentInfo);
-    } else if (!isSame(this.currentPaymentInfo, paymentInfo)) {
+    } else if (forceUpdate || !isSame(this.currentPaymentInfo, paymentInfo)) {
       this.updateMonetization(paymentInfo, aDocument);
     }
   }

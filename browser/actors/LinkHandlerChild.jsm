@@ -203,6 +203,23 @@ class LinkHandlerChild extends JSWindowActorChild {
     }
   }
 
+  receiveMessage(msg) {
+    switch (msg.name) {
+      case "monetization:refresh:request": {
+        const sessionId = msg.data;
+        if (this.monetizationLoader.sessionId === sessionId) {
+          this.monetizationLoader.doUpdateMonetization(this.document, true);
+          return Promise.resolve({
+            oldSessionId: sessionId,
+            newSessionId: this.monetizationLoader.sessionId,
+          });
+        }
+        break;
+      }
+    }
+    return null;
+  }
+
   handleEvent(event) {
     switch (event.type) {
       case "pageshow":

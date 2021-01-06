@@ -79,6 +79,7 @@
       {
         "name": "refresh",
         "type": "function",
+        "async": true,
         "parameters": [
           {
             "name": "sessionId",

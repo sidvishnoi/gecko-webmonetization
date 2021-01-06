@@ -41,6 +41,14 @@ this.monetization = class extends ExtensionAPI {
           "monetization:resume",
           "monetization.onResume"
         ),
+        async refresh(sessionId) {
+          Services.obs.notifyObservers(null, "monetization:refresh", sessionId);
+          const { data } = await ExtensionUtils.promiseObserved(
+            "monetization:refresh:response",
+            (subject, data) => JSON.parse(data).oldSessionId === sessionId
+          );
+          return JSON.parse(data).newSessionId;
+        },
       },
     };
   }
