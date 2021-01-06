@@ -56,6 +56,7 @@ const monetization = new (class MonetizationService {
 
 class LinkHandlerParent extends JSWindowActorParent {
   actorCreated() {
+    this.monetizationSessionId = null;
     this._monetizationRefreshCallback = async (subject, topic, sessionId) => {
       const res = await this.sendQuery(
         "monetization:refresh:request",
@@ -76,6 +77,9 @@ class LinkHandlerParent extends JSWindowActorParent {
   }
 
   didDestroy() {
+    if (this.monetizationSessionId) {
+      monetization.stop({ sessionId: this.monetizationSessionId });
+    }
     Services.obs.removeObserver(
       this._monetizationRefreshCallback,
       "monetization:refresh"
@@ -165,6 +169,7 @@ class LinkHandlerParent extends JSWindowActorParent {
         break;
 
       case "Link:SetMonetization":
+        this.monetizationSessionId = aMsg.data.sessionId;
         monetization.start(aMsg.data);
         break;
 
@@ -172,6 +177,7 @@ class LinkHandlerParent extends JSWindowActorParent {
         break;
 
       case "Link:UnsetMonetization":
+        this.monetizationSessionId = null;
         monetization.stop(aMsg.data);
         break;
 

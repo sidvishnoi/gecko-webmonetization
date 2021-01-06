@@ -295,6 +295,9 @@ class Monetization {
   stop(sessionId) {
     this.state = "stopped";
     this.cancel();
+    if (this.actor.docShell.isBeingDestroyed()) {
+      return;
+    }
     this.actor.sendAsyncMessage("Link:UnsetMonetization", { sessionId });
   }
 
