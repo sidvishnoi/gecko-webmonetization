@@ -350,7 +350,6 @@ class MonetizationLoader {
         // Do nothing.
       }
     } else if (this.currentPaymentInfo) {
-      console.log("🤑 (Re)start monetization", aDocument.location.href);
       this.resumeMonetization();
     } else {
       this.doUpdateMonetization(aDocument, true);
@@ -365,13 +364,11 @@ class MonetizationLoader {
       aDocument.visibilityState === "visible" &&
       !this.currentPaymentInfo
     ) {
-      console.log("onPageShow()");
       this.doUpdateMonetization(aDocument);
     }
   }
 
   onPageHide(aDocument) {
-    console.log("🤑☠ Stop monetization onPageHide()");
     this.document = null;
     this.stopMonetization(aDocument);
   }
@@ -382,7 +379,6 @@ class MonetizationLoader {
 
     const paymentInfo = getPaymentInfo(aDocument);
     if (!paymentInfo) {
-      console.log("💔 no paymentInfo");
       if (this.currentPaymentInfo) {
         // all link tags have been removed, or the first such link tag is not valid anymore.
         this.stopMonetization(aDocument);
@@ -400,18 +396,12 @@ class MonetizationLoader {
   }
 
   startMonetization(aPaymentInfo) {
-    console.info(
-      "🤑 Start monetization",
-      aPaymentInfo.pageUri.spec,
-      aPaymentInfo.paymentPointerUri.spec
-    );
     this.sessionId = generateSessionId();
     this.currentPaymentInfo = aPaymentInfo;
     this.fetchPaymentInfo();
   }
 
   stopMonetization(aDocument) {
-    console.info("🤑 Stop monetization", aDocument?.location.href);
     const sessionId = this.sessionId;
     this.sessionId = null;
     this.currentPaymentInfo = null;
@@ -420,17 +410,14 @@ class MonetizationLoader {
   }
 
   pauseMonetization() {
-    console.log("🤑 Pause", this.document?.location?.href);
     this.loader.pause(this.sessionId);
   }
 
   resumeMonetization() {
-    console.log("🤑 Resume", this.document?.location?.href);
     this.loader.resume(this.sessionId);
   }
 
   updateMonetization(aPaymentInfo, aDocument) {
-    console.info("🤑 Update monetization", aDocument?.location.href);
     this.stopMonetization(aDocument);
     this.startMonetization(aPaymentInfo);
   }
@@ -458,7 +445,6 @@ class MonetizationLoader {
  */
 function getPaymentInfo(aDocument) {
   if (!aDocument) {
-    console.trace("no aDocument");
     return null;
   }
   const link = aDocument.head.querySelector("link[rel~=monetization][href]");
