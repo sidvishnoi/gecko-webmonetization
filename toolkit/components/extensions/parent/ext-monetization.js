@@ -49,6 +49,14 @@ this.monetization = class extends ExtensionAPI {
           );
           return JSON.parse(data).newSessionId;
         },
+        completePayment(sessionId, amount, receipt) {
+          const data = { sessionId, amount, receipt };
+          Services.obs.notifyObservers(
+            null,
+            "monetization:complete",
+            JSON.stringify(data)
+          );
+        },
       },
     };
   }

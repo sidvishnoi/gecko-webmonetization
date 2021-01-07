@@ -73,6 +73,26 @@
           {
             "name": "sessionId",
             "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string"
+              },
+              "assetCode": {
+                "type": "string"
+              },
+              "assetScale": {
+                "type": "number"
+              }
+            }
+          },
+          {
+            "name": "receipt",
+            "type": "string",
+            "optional": true
           }
         ]
       },

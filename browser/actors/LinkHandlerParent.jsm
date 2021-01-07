@@ -74,6 +74,17 @@ class LinkHandlerParent extends JSWindowActorParent {
       this._monetizationRefreshCallback,
       "monetization:refresh"
     );
+
+    this._monetizationCompleteCallback = (subject, topic, data) => {
+      const res = JSON.parse(data);
+      if (res.sessionId === this.monetizationSessionId) {
+        this.sendAsyncMessage("monetization:complete:request", res);
+      }
+    };
+    Services.obs.addObserver(
+      this._monetizationCompleteCallback,
+      "monetization:complete"
+    );
   }
 
   didDestroy() {
@@ -83,6 +94,10 @@ class LinkHandlerParent extends JSWindowActorParent {
     Services.obs.removeObserver(
       this._monetizationRefreshCallback,
       "monetization:refresh"
+    );
+    Services.obs.removeObserver(
+      this._monetizationCompleteCallback,
+      "monetization:complete"
     );
   }
 

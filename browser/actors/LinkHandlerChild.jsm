@@ -216,6 +216,13 @@ class LinkHandlerChild extends JSWindowActorChild {
         }
         break;
       }
+      case "monetization:complete:request": {
+        const event = Cu.cloneInto({ detail: msg.json }, this.document);
+        this.document.dispatchEvent(
+          new this.contentWindow.CustomEvent("monetizationprogress", event)
+        );
+        break;
+      }
     }
     return null;
   }
