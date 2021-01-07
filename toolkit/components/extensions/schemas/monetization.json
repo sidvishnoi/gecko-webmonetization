@@ -18,10 +18,12 @@
       {
         "name": "onStart",
         "type": "function",
+        "description": "Fired when a website has requested payments by the virtue of it having a valid payment pointer.",
         "parameters": [
           {
             "name": "sessionId",
-            "type": "string"
+            "type": "string",
+            "description": "A UUID (v4) to identify the session. Each onStart event gets a unique sessionId."
           },
           {
             "name": "spspResponse",
@@ -37,16 +39,19 @@
       {
         "name": "onStop",
         "type": "function",
+        "description": "Fired when browser believes that a payment should be stopped (user navigated away, payment pointer changed, user asked not to pay given website etc.).",
         "parameters": [
           {
             "name": "sessionId",
-            "type": "string"
+            "type": "string",
+            "description": "Session ID for which the payments should be stopped."
           }
         ]
       },
       {
         "name": "onPause",
         "type": "function",
+        "description": "Fired when user has navigated away from a tab that had an active payment session.",
         "parameters": [
           {
             "name": "sessionId",
@@ -56,6 +61,7 @@
       },
       {
         "name": "onResume",
+        "description": "Fired when user has navigated back to a tab that previously had an active payment session. The payment tokens may not be valid anymore when this event is fired.",
         "type": "function",
         "parameters": [
           {
@@ -68,6 +74,7 @@
     "functions": [
       {
         "name": "completePayment",
+        "description": "Notify the browser and the website of the payment progress.",
         "type": "function",
         "parameters": [
           {
@@ -99,6 +106,7 @@
       {
         "name": "refresh",
         "type": "function",
+        "description": "Request the browser to fetch the SPSP response again as the old one has expired. Resolves with a sessionId for a new payment session, and causes a stop and a start event to be fired.",
         "async": true,
         "parameters": [
           {
