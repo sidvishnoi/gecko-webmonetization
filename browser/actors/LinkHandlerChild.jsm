@@ -217,9 +217,20 @@ class LinkHandlerChild extends JSWindowActorChild {
         break;
       }
       case "monetization:complete:request": {
-        const event = Cu.cloneInto({ detail: msg.json }, this.document);
+        const details = Cu.cloneInto(msg.json, this.document);
+        const eventInit = {
+          url: this.monetizationLoader.currentPaymentInfo.paymentPointerUri
+            .spec,
+          amount: details.amount.value,
+          assetCode: details.amount.assetCode,
+          assetScale: details.amount.assetScale,
+          receipt: details.receipt,
+        };
         this.document.dispatchEvent(
-          new this.contentWindow.CustomEvent("monetizationprogress", event)
+          new this.contentWindow.MonetizationProgressEvent(
+            "monetizationprogress",
+            eventInit
+          )
         );
         break;
       }
