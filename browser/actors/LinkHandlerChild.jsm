@@ -226,9 +226,9 @@ class LinkHandlerChild extends JSWindowActorChild {
           assetScale: details.amount.assetScale,
           receipt: details.receipt,
         };
-        this.document.dispatchEvent(
+        this.contentWindow.navigator.monetization.dispatchEvent(
           new this.contentWindow.MonetizationProgressEvent(
-            "monetizationprogress",
+            "progress",
             eventInit
           )
         );

@@ -58,6 +58,7 @@ DIRS += [
     "uitour",
     "urlbar",
     "translation",
+    "webmonetization",
 ]
 
 DIRS += ["build"]
