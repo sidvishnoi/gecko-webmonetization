@@ -523,6 +523,22 @@ let JSWINDOWACTORS = {
         DOMHeadElementParsed: {},
         DOMLinkAdded: {},
         DOMLinkChanged: {},
+        pageshow: {},
+        pagehide: {},
+      },
+    },
+  },
+
+  Monetization: {
+    parent: {
+      moduleURI: "resource:///actors/MonetizationParent.jsm",
+    },
+    child: {
+      moduleURI: "resource:///actors/MonetizationChild.jsm",
+      events: {
+        DOMHeadElementParsed: {},
+        DOMLinkAdded: {},
+        DOMLinkChanged: {},
         DOMLinkRemoved: {},
         pageshow: {},
         pagehide: {},

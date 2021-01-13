@@ -67,6 +67,8 @@ FINAL_TARGET_FILES.actors += [
     "LightweightThemeChild.jsm",
     "LinkHandlerChild.jsm",
     "LinkHandlerParent.jsm",
+    "MonetizationChild.jsm",
+    "MonetizationParent.jsm",
     "NetErrorChild.jsm",
     "NetErrorParent.jsm",
     "PageInfoChild.jsm",
