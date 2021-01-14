@@ -100,12 +100,17 @@ class MonetizationLoader {
     this.currentPaymentInfo = null;
     this.sessionId = null;
 
-    this.loader = new Monetization(actor);
-
     this.fetchPaymentInfoTask = new DeferredTask(
       () => this.fetchPaymentInfo(),
       DEFER_TASK_TIMEOUT
     );
+  }
+
+  get loader() {
+    if (!this._loader) {
+      this._loader = new Monetization(this.actor);
+    }
+    return this._loader;
   }
 
   onLinkEvent(aDocument) {
