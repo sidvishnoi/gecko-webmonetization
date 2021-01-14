@@ -49,7 +49,10 @@ const ALLOWED_MIME_TYPES = [
 
 class MonetizationFetcher {
   /**
-   * @param {ReturnType<typeof makePaymentInfoFromLink>} paymentPointerInfo
+   * @param {object} paymentPointerInfo
+   * @param {DOMNode} paymentPointerInfo.node
+   * @param {nsIURI} paymentPointerInfo.paymentPointerUri
+   * @param {nsIURI} paymentPointerInfo.pageUri
    */
   constructor(paymentPointerInfo) {
     this.paymentPointerInfo = paymentPointerInfo;
