@@ -6,7 +6,7 @@
 var EXPORTED_SYMBOLS = ["Monetization"];
 
 /**
- * `window.navigator.monetization` interface.
+ * `window.monetization` interface.
  * See {@link dom/webidl/Monetization.webidl} for interface definition.
  */
 class Monetization {

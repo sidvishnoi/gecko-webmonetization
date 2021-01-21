@@ -397,6 +397,11 @@ partial interface Window {
   [Replaceable, Pure, StoreInSlot] readonly attribute Performance? performance;
 };
 
+// Monetization
+partial interface Window {
+  readonly attribute Monetization monetization;
+};
+
 // https://dvcs.w3.org/hg/webcrypto-api/raw-file/tip/spec/Overview.html
 Window includes GlobalCrypto;
 

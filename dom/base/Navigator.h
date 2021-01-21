@@ -9,7 +9,6 @@
 
 #include "mozilla/MemoryReporting.h"
 #include "mozilla/dom/AddonManagerBinding.h"
-#include "mozilla/dom/MonetizationBinding.h"
 #include "mozilla/dom/BindingDeclarations.h"
 #include "mozilla/dom/Fetch.h"
 #include "mozilla/dom/Nullable.h"
@@ -34,7 +33,6 @@ namespace dom {
 class AddonManager;
 class BodyExtractorBase;
 class Geolocation;
-class Monetization;
 class systemMessageCallback;
 class MediaDevices;
 struct MediaStreamConstraints;
@@ -227,7 +225,6 @@ class Navigator final : public nsISupports, public nsWrapperCache {
 
   dom::MediaCapabilities* MediaCapabilities();
   dom::MediaSession* MediaSession();
-  dom::Monetization* Monetization();
 
   AddonManager* GetMozAddonManager(ErrorResult& aRv);
 
@@ -295,7 +292,6 @@ class Navigator final : public nsISupports, public nsWrapperCache {
   RefPtr<dom::MediaCapabilities> mMediaCapabilities;
   RefPtr<dom::MediaSession> mMediaSession;
   RefPtr<AddonManager> mAddonManager;
-  RefPtr<dom::Monetization> mMonetization;
   RefPtr<webgpu::Instance> mWebGpu;
   RefPtr<Promise> mSharePromise;  // Web Share API related
   // Gamepad moving to secure contexts
