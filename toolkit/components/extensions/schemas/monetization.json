@@ -29,8 +29,14 @@
             "name": "spspResponse",
             "type": "object",
             "properties": {
-              "destination_account": {
+              "destinationAccount": {
                 "type": "string"
+              },
+              "sharedSecret": {
+                "type": "string"
+              },
+              "receiptsEnabled": {
+                "type": "boolean"
               }
             }
           }
