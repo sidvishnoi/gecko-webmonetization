@@ -7,17 +7,17 @@
 [Exposed=Window, SecureContext]
 interface MonetizationProgressEvent : Event {
   [ChromeOnly] constructor(DOMString type, MonetizationProgressEventInit eventInitDict);
-  readonly attribute USVString      url;
-  readonly attribute DOMString      amount;
-  readonly attribute DOMString      assetCode;
-  readonly attribute unsigned long  assetScale;
-  readonly attribute DOMString?     receipt;
+  readonly attribute USVString  url;
+  readonly attribute DOMString  amount;
+  readonly attribute DOMString  assetCode;
+  readonly attribute octet      assetScale;
+  readonly attribute DOMString? receipt;
 };
 
 dictionary MonetizationProgressEventInit : EventInit {
-  required USVString url;
-  required DOMString      amount;
-  required DOMString      assetCode;
-  required unsigned long  assetScale;
-           DOMString?     receipt = null;
+  required USVString  url;
+  required DOMString  amount;
+  required DOMString  assetCode;
+  required octet      assetScale;
+           DOMString? receipt = null;
 };
